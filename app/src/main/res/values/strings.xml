@@ -6,5 +6,7 @@
 
     <string name="Ask_for_row_and_column">行数と列数を入力</string>
     <string name="Num_of_row">行数</string>
+    <string name="Unit_of_row">行</string>
     <string name="Num_of_column">列数</string>
+    <string name="Unit_of_column">列</string>
 </resources>
