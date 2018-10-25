@@ -9,4 +9,9 @@
     <string name="Unit_of_row">行</string>
     <string name="Num_of_column">列数</string>
     <string name="Unit_of_column">列</string>
+    <string name="Next">次へ</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>
