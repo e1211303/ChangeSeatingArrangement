@@ -9,6 +9,7 @@
 
     <!--座席のチェックボックス　はじめは空-->
     <GridLayout
+        android:id="@+id/GridLayout_checkboxesContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:columnWidth="10dp"

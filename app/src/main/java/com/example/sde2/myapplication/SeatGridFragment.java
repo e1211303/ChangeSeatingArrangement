@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.GridLayout;
 
 
@@ -63,6 +64,9 @@ public class SeatGridFragment extends Fragment {
             numRows = getArguments().getInt(ARG_NUM_ROWS);
             numCols = getArguments().getInt(ARG_NUM_COLS);
         }
+
+        // TODO: 渡された値を基にgridに入ったチェックボックスを作って表示したい
+        CheckBox[][] checkBox = new CheckBox[numRows][numCols];
     }
 
     @Override
