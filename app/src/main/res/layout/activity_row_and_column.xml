@@ -110,32 +110,39 @@
 
     </RelativeLayout>
 
-
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="292dp"
+    <HorizontalScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="9dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
 
-        <RelativeLayout
-            android:id="@+id/GridContainer"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </RelativeLayout>
+            android:layout_height="match_parent">
 
-        <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="vertical" />-->
-    </ScrollView>
+            <RelativeLayout
+                android:id="@+id/GridContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </ScrollView>
+
+
+
+
+
+
+
+
+    </HorizontalScrollView>
+
 
 </android.support.constraint.ConstraintLayout>

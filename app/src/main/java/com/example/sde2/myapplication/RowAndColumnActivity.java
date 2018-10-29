@@ -1,6 +1,7 @@
 package com.example.sde2.myapplication;
 
 
+import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -15,7 +16,7 @@ import android.widget.Spinner;
 
 
 public class RowAndColumnActivity extends AppCompatActivity
-        implements View.OnClickListener {
+        implements View.OnClickListener,SeatGridFragment.OnFragmentInteractionListener {
 
     private static final String ARG_NUM_ROWS = "param1";
     private static final String ARG_NUM_COLS = "param2";
@@ -28,7 +29,7 @@ public class RowAndColumnActivity extends AppCompatActivity
         ((Button)findViewById(R.id.button_next)).setOnClickListener(this);
 
     }
-
+//todo: じかんがかかるのでなんか表示
     public void onClick(View view){
         int id = view.getId();
         switch (id){
@@ -55,7 +56,7 @@ public class RowAndColumnActivity extends AppCompatActivity
 
                 //生成したフラグメントをRelativeLayoutに追加
                 getSupportFragmentManager().beginTransaction()
-                        .add(R.id.GridContainer,fragment)
+                        .replace(R.id.GridContainer,fragment)
                         .commit();
 
 
@@ -63,4 +64,8 @@ public class RowAndColumnActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
 }

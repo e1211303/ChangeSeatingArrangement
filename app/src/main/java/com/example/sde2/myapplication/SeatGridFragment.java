@@ -4,12 +4,14 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.GridLayout;
 import android.widget.GridView;
+import android.widget.TextView;
 
 
 /**
@@ -30,6 +32,8 @@ public class SeatGridFragment extends Fragment {
     // 行数と列数の記憶
     private int numRows=0;
     private int numCols=0;
+
+    CheckBox[][] checkBoxes;
 
     private OnFragmentInteractionListener mListener;
 
@@ -65,31 +69,58 @@ public class SeatGridFragment extends Fragment {
             numRows = getArguments().getInt(ARG_NUM_ROWS);
             numCols = getArguments().getInt(ARG_NUM_COLS);
         }
+        // チェックボックス用意
+        checkBoxes = new CheckBox[numRows][numCols]; //1次元に？
+        //チェックしたものをGridViewに追加
+        for (int i=0;i<numRows;i++) {
+            for (int j=0;j<numCols;j++) {
+                checkBoxes[i][j] = new CheckBox(getActivity());
+                checkBoxes[i][j].setChecked(true);
+            }
+        }
     }
 
     //onCreateの直後
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        //GridLayoutにチェックボックスを追加
         View view =
                 inflater.inflate(R.layout.fragment_seat_grid, container, false);
-
-        // TODO: 渡された値を基にgridに入ったチェックボックスを作って表示したい
         GridLayout gridLayout =
-                (GridLayout)view.findViewById(R.id.GridLayout_checkboxesContainer);
-        gridLayout.clearDisappearingChildren(); //???
-        gridLayout.setColumnCount(numCols);
-        CheckBox[][] checkBoxes = new CheckBox[numRows][numCols]; //1次元に？
-        //チェックしたものをGridViewに追加
-        for (CheckBox[] rowCheckBoxes:checkBoxes
-             ) {
-            for (CheckBox aCheckBox:rowCheckBoxes
-                 ) {
-                aCheckBox.setChecked(true);
-                gridLayout.addView(aCheckBox);
+                (GridLayout) view.findViewById(R.id.GridLayout_checkboxesContainer);
+        gridLayout.removeAllViews();
+
+        for(int i=0;i<numRows;i++) {
+            //行数表示
+            GridLayout.LayoutParams params1 = new GridLayout.LayoutParams();
+            params1.rowSpec=GridLayout.spec(i);
+            params1.columnSpec=GridLayout.spec(0);
+            int margin = 30;
+            params1.setMargins(margin,margin,margin,margin);
+
+            TextView rowText = new TextView(getActivity());
+            rowText.setText(String.valueOf(i+1));
+            rowText.setGravity(Gravity.CENTER);
+            gridLayout.addView(rowText,params1);
+
+            for (int j=0;j<numCols;j++) {
+                //チェックボックスをセット
+                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                params.rowSpec=GridLayout.spec(i);
+                params.columnSpec = GridLayout.spec(j+1);
+
+                params.setMargins(margin,margin,margin,margin);
+                gridLayout.addView(checkBoxes[i][j],params);
             }
         }
-        // Inflate the layout for this fragment
+
+        // todo: gridlayoutの整形
+//        GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+//        params.columnSpec = GridLayout.spec()
+
+
         return view;
     }
 
