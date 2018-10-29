@@ -33,9 +33,16 @@ public class RowAndColumnActivity extends AppCompatActivity
         int id = view.getId();
         switch (id){
             case R.id.button_next: //「次へ」ボタン
-                //入力された行数列数
-                int rows = (int)((Spinner)findViewById(R.id.spinner_row)).getSelectedItem();
-                int cols = (int)((Spinner)findViewById(R.id.spinner_column)).getSelectedItem();
+                //spinner自体を取得
+                Spinner spinnerRow = (Spinner)findViewById(R.id.spinner_row);
+                Spinner spinnerCol = (Spinner)findViewById(R.id.spinner_column);
+
+                //選択項目を取得（String）
+                String stringSelectedRow = spinnerRow.getSelectedItem().toString();
+                String stringSelectedCol = spinnerCol.getSelectedItem().toString();
+                //数字に変換
+                int rows = Integer.parseInt(stringSelectedRow);
+                int cols = Integer.parseInt(stringSelectedCol);
 
                 //フラグメントに渡す引数を用意
                 Bundle bundle = new Bundle();
@@ -47,10 +54,10 @@ public class RowAndColumnActivity extends AppCompatActivity
                 fragment.setArguments(bundle);
 
                 //生成したフラグメントをRelativeLayoutに追加
-                FragmentManager manager = getSupportFragmentManager();
-                FragmentTransaction transaction = manager.beginTransaction();
-                transaction.add(R.id.GridContainer,fragment);
-                transaction.commit();
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.GridContainer,fragment)
+                        .commit();
+
 
                 break;
         }

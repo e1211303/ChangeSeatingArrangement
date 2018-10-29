@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.GridLayout;
+import android.widget.GridView;
 
 
 /**
@@ -27,8 +28,8 @@ public class SeatGridFragment extends Fragment {
 
     // TODO: Rename and change types of parameters
     // 行数と列数の記憶
-    private int numRows;
-    private int numCols;
+    private int numRows=0;
+    private int numCols=0;
 
     private OnFragmentInteractionListener mListener;
 
@@ -64,16 +65,32 @@ public class SeatGridFragment extends Fragment {
             numRows = getArguments().getInt(ARG_NUM_ROWS);
             numCols = getArguments().getInt(ARG_NUM_COLS);
         }
-
-        // TODO: 渡された値を基にgridに入ったチェックボックスを作って表示したい
-        CheckBox[][] checkBox = new CheckBox[numRows][numCols];
     }
 
+    //onCreateの直後
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view =
+                inflater.inflate(R.layout.fragment_seat_grid, container, false);
+
+        // TODO: 渡された値を基にgridに入ったチェックボックスを作って表示したい
+        GridLayout gridLayout =
+                (GridLayout)view.findViewById(R.id.GridLayout_checkboxesContainer);
+        gridLayout.clearDisappearingChildren(); //???
+        gridLayout.setColumnCount(numCols);
+        CheckBox[][] checkBoxes = new CheckBox[numRows][numCols]; //1次元に？
+        //チェックしたものをGridViewに追加
+        for (CheckBox[] rowCheckBoxes:checkBoxes
+             ) {
+            for (CheckBox aCheckBox:rowCheckBoxes
+                 ) {
+                aCheckBox.setChecked(true);
+                gridLayout.addView(aCheckBox);
+            }
+        }
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_seat_grid, container, false);
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
