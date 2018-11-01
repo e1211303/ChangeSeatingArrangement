@@ -97,8 +97,9 @@ public class SeatGridFragment extends Fragment {
             GridLayout.LayoutParams params1 = new GridLayout.LayoutParams();
             params1.rowSpec=GridLayout.spec(i);
             params1.columnSpec=GridLayout.spec(0);
-            int margin = 30;
+            int margin = R.integer.GridMargin;
             params1.setMargins(margin,margin,margin,margin);
+            params1.setGravity(Gravity.CENTER);
 
             TextView rowText = new TextView(getActivity());
             rowText.setText(String.valueOf(i+1));
@@ -110,6 +111,7 @@ public class SeatGridFragment extends Fragment {
                 GridLayout.LayoutParams params = new GridLayout.LayoutParams();
                 params.rowSpec=GridLayout.spec(i);
                 params.columnSpec = GridLayout.spec(j+1);
+                params.setGravity(Gravity.CENTER);
 
                 params.setMargins(margin,margin,margin,margin);
                 gridLayout.addView(checkBoxes[i][j],params);

@@ -2,17 +2,14 @@ package com.example.sde2.myapplication;
 
 
 import android.net.Uri;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridLayout;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
-
-
+import android.widget.TextView;
 
 
 public class RowAndColumnActivity extends AppCompatActivity
@@ -26,14 +23,14 @@ public class RowAndColumnActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_row_and_column);
 
-        ((Button)findViewById(R.id.button_next)).setOnClickListener(this);
+        ((Button)findViewById(R.id.button_OK)).setOnClickListener(this);
 
     }
-//todo: じかんがかかるのでなんか表示
+//todo: じかんがかかるのでなんか表示したい
     public void onClick(View view){
         int id = view.getId();
         switch (id){
-            case R.id.button_next: //「次へ」ボタン
+            case R.id.button_OK: //「次へ」ボタン
                 //spinner自体を取得
                 Spinner spinnerRow = (Spinner)findViewById(R.id.spinner_row);
                 Spinner spinnerCol = (Spinner)findViewById(R.id.spinner_column);
@@ -58,6 +55,52 @@ public class RowAndColumnActivity extends AppCompatActivity
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.GridContainer,fragment)
                         .commit();
+
+                //行列番号表示部
+                final int size = R.integer.GridSize;
+                final int margin = R.integer.GridMargin;
+                //列について
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size,size);
+                params.setMargins(margin,0,margin,0);
+                params.gravity = Gravity.BOTTOM;
+                LinearLayout linear_col = (LinearLayout)findViewById(R.id.LinearLayout_colNums);
+                linear_col.removeAllViews();
+                for(int i=0;i<cols;i++)
+                {
+                    //追加するテキストview
+                    TextView textView = new TextView(this);
+                    textView.setText(String.valueOf(i+1));
+                    textView.setGravity(Gravity.BOTTOM);
+                    linear_col.addView(textView,params);
+                }
+
+                //行番号も
+                params.setMargins(0,margin,0,margin);
+                params.gravity = Gravity.RIGHT;
+                LinearLayout linear_row = (LinearLayout)findViewById(R.id.LinearLayout_rowNums);
+                linear_row.removeAllViews();
+                for(int i=0;i<rows;i++)
+                {
+                    //追加するテキスト
+                    TextView textView = new TextView(this);
+                    textView.setText(String.valueOf(i+1));
+                    textView.setGravity(Gravity.RIGHT);
+                    linear_row.addView(textView,params);
+                }
+
+                //次へボタンを有効化
+                Button button_next = (Button)findViewById(R.id.button_next);
+                button_next.setEnabled(true);
+
+
+
+
+                //チェックボックス操作を促すメッセージ
+
+                break;
+
+            case R.id.button_next:
+                //チェックボックス内容を入力
 
 
                 break;

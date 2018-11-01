@@ -19,9 +19,23 @@
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
+
+        <Button
+            android:id="@+id/button_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/button_OK"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginRight="3dp"
+            android:text="@string/Next"
+            android:visibility="visible" />
 
         <LinearLayout
             android:id="@+id/LinearLayout_input_row_and_column"
@@ -97,52 +111,81 @@
             android:textSize="30sp" />
 
         <Button
-            android:id="@+id/button_next"
+            android:id="@+id/button_OK"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/LinearLayout_input_row_and_column"
-            android:layout_marginStart="25dp"
-            android:layout_marginLeft="25dp"
-            android:layout_marginBottom="0dp"
+            android:layout_alignTop="@+id/LinearLayout_input_row_and_column"
+            android:layout_marginStart="42dp"
+            android:layout_marginLeft="42dp"
+            android:layout_marginTop="-9dp"
             android:layout_toEndOf="@+id/LinearLayout_input_row_and_column"
             android:layout_toRightOf="@+id/LinearLayout_input_row_and_column"
-            android:text="@string/Next" />
+            android:text="@string/OK" />
 
     </RelativeLayout>
 
     <HorizontalScrollView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="9dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:id="@+id/horizontalScrollView_ForGrid"
+        android:layout_width="548dp"
+        android:layout_height="235dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="72dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
 
         <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left">
 
             <RelativeLayout
                 android:id="@+id/GridContainer"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </ScrollView>
 
 
-
-
-
-
-
-
     </HorizontalScrollView>
+
+    <HorizontalScrollView
+        android:id="@+id/Horizontal_ForColNum"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/horizontalScrollView_ForGrid"
+        app:layout_constraintEnd_toEndOf="@+id/horizontalScrollView_ForGrid"
+        app:layout_constraintStart_toStartOf="@+id/horizontalScrollView_ForGrid"
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
+
+        <LinearLayout
+            android:id="@+id/LinearLayout_rowNums"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:minWidth="@string/GridSize"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <ScrollView
+        android:id="@+id/ScrollView_ForRowNum"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/horizontalScrollView_ForGrid"
+        app:layout_constraintEnd_toStartOf="@+id/horizontalScrollView_ForGrid"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/horizontalScrollView_ForGrid">
+
+        <LinearLayout
+            android:id="@+id/LinearLayout_colNums"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:minHeight="@string/GridSize"
+            android:orientation="vertical" />
+    </ScrollView>
 
 
 </android.support.constraint.ConstraintLayout>
