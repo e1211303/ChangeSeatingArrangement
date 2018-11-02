@@ -12,7 +12,7 @@ public class ObservableScrollView extends ScrollView {
         void onScrollChanged(ObservableScrollView scrollView, int x, int y, int oldx, int oldy);
     }
 
-    private ScrollViewListener scrollViewListener = null;
+    private ScrollViewListener mScrollViewListener = null;
     private int lasty=0;
 
     public ObservableScrollView(Context context) {
@@ -28,14 +28,14 @@ public class ObservableScrollView extends ScrollView {
     }
 
     public void setOnScrollViewListener(ScrollViewListener scrollViewListener) {
-        this.scrollViewListener = scrollViewListener;
+        this.mScrollViewListener = scrollViewListener;
     }
 
     @Override
     protected void onScrollChanged(int x, int y, int oldx, int oldy) {
         super.onScrollChanged(x, y, oldx, oldy);
-        if (scrollViewListener != null&&y!=lasty) {
-            scrollViewListener.onScrollChanged(this,x, y, oldx, oldy);
+        if (mScrollViewListener != null&&y!=lasty) {
+            mScrollViewListener.onScrollChanged(this,x, y, oldx, oldy);
             lasty=y;
         }
     }

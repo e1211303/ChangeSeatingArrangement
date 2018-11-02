@@ -9,7 +9,7 @@ public class ObservableHorizontalScrollView extends HorizontalScrollView {
         void onScrollChanged(ObservableHorizontalScrollView scrollView, int x, int y, int oldx, int oldy);
     }
 
-    private ScrollViewListener scrollViewListener = null;
+    private ScrollViewListener mScrollViewListener = null;
     private int lastx=0;
 
     public ObservableHorizontalScrollView(Context context) {
@@ -25,14 +25,14 @@ public class ObservableHorizontalScrollView extends HorizontalScrollView {
     }
 
     public void setOnScrollViewListener(ScrollViewListener scrollViewListener) {
-        this.scrollViewListener = scrollViewListener;
+        this.mScrollViewListener = scrollViewListener;
     }
 
     @Override
     protected void onScrollChanged(int x, int y, int oldx, int oldy) {
         super.onScrollChanged(x, y, oldx, oldy);
-        if (scrollViewListener != null&&lastx!=x) {
-            scrollViewListener.onScrollChanged(this, x, y, oldx, oldy);
+        if (mScrollViewListener != null&&lastx!=x) {
+            mScrollViewListener.onScrollChanged(this, x, y, oldx, oldy);
             lastx=x;
         }
     }
