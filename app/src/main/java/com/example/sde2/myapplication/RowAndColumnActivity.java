@@ -25,6 +25,18 @@ public class RowAndColumnActivity extends AppCompatActivity
 
         ((Button)findViewById(R.id.button_OK)).setOnClickListener(this);
         ((Button)findViewById(R.id.button_next)).setEnabled(false);
+
+        //行数表示部の設定
+        LockableScrollView VerticalScroll =
+                (LockableScrollView)findViewById(R.id.ScrollView_ForRowNum);
+        VerticalScroll.setScrollingEnabled(false);
+        VerticalScroll.setVerticalScrollBarEnabled(false);
+
+        //列数表示部の設定
+        LockableHorizontalScrollView HorizontalScroll =
+                (LockableHorizontalScrollView)findViewById(R.id.Horizontal_ForColNum);
+        HorizontalScroll.setScrollingEnabled(false);
+        HorizontalScroll.setHorizontalScrollBarEnabled(false);
     }
 //todo: じかんがかかるのでなんか表示したい
     public void onClick(View view){

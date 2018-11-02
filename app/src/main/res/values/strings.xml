@@ -4,7 +4,7 @@
     <string name="Start">始める</string>
     <string name="Continue">続きから</string>
 
-    <string name="Ask_for_row_and_column">行数と列数を入力</string>
+    <string name="Ask_for_row_and_column">大きさを決定し、空席を除外</string>
     <string name="Num_of_row">行数</string>
     <string name="Unit_of_row">行</string>
     <string name="Num_of_column">列数</string>
