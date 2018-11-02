@@ -7,13 +7,19 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 
 public class RowAndColumnActivity extends AppCompatActivity
-        implements View.OnClickListener,SeatGridFragment.OnFragmentInteractionListener {
+        implements
+        View.OnClickListener,
+        SeatGridFragment.OnFragmentInteractionListener,
+        ObservableScrollView.ScrollViewListener,
+        ObservableHorizontalScrollView.ScrollViewListener
+{
 
     private static final String ARG_NUM_ROWS = "param1";
     private static final String ARG_NUM_COLS = "param2";
@@ -37,6 +43,15 @@ public class RowAndColumnActivity extends AppCompatActivity
                 (LockableHorizontalScrollView)findViewById(R.id.Horizontal_ForColNum);
         HorizontalScroll.setScrollingEnabled(false);
         HorizontalScroll.setHorizontalScrollBarEnabled(false);
+
+        //スクロール通知を受け取る設定
+        ObservableScrollView observableScrollView=
+                findViewById(R.id.ScrollView_ForGrid);
+        observableScrollView.setOnScrollViewListener(this);
+
+        ObservableHorizontalScrollView observableHorizontalScrollView=
+                (ObservableHorizontalScrollView)findViewById(R.id.HorizontalScrollView_ForGrid);
+        observableHorizontalScrollView.setOnScrollViewListener(this);
     }
 //todo: じかんがかかるのでなんか表示したい
     public void onClick(View view){
@@ -118,9 +133,44 @@ public class RowAndColumnActivity extends AppCompatActivity
 
             case R.id.button_next:
                 //チェックボックス内容を入力
-
-
                 break;
+            default:
+                break;
+        }
+    }
+
+    //グリッド横スクロール
+    @Override
+    public void onScrollChanged(ObservableHorizontalScrollView scrollView, int x, int y, int oldx, int oldy){
+        int id = scrollView.getId();
+        switch (id)
+        {
+            case R.id.HorizontalScrollView_ForGrid:
+                //横合わせる
+                LockableHorizontalScrollView lockableHorizontalScrollView=
+                        (LockableHorizontalScrollView)findViewById(R.id.Horizontal_ForColNum);
+                lockableHorizontalScrollView.setScrollX(x);
+                break;
+
+                default:
+                    break;
+        }
+    }
+
+    @Override
+    public void onScrollChanged(ObservableScrollView scrollView, int x, int y, int oldx, int oldy){
+        int id = scrollView.getId();
+        switch(id)
+        {
+            case R.id.ScrollView_ForGrid:
+                //縦合わせる
+                LockableScrollView lockableScrollView=
+                        (LockableScrollView)findViewById(R.id.ScrollView_ForRowNum);
+                lockableScrollView.setScrollY(y);
+                break;
+
+                default:
+                    break;
         }
     }
 
