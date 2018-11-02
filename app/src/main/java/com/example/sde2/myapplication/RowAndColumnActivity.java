@@ -24,13 +24,13 @@ public class RowAndColumnActivity extends AppCompatActivity
         setContentView(R.layout.activity_row_and_column);
 
         ((Button)findViewById(R.id.button_OK)).setOnClickListener(this);
-
+        ((Button)findViewById(R.id.button_next)).setEnabled(false);
     }
 //todo: じかんがかかるのでなんか表示したい
     public void onClick(View view){
         int id = view.getId();
         switch (id){
-            case R.id.button_OK: //「次へ」ボタン
+            case R.id.button_OK: //「決定」ボタン
                 //spinner自体を取得
                 Spinner spinnerRow = (Spinner)findViewById(R.id.spinner_row);
                 Spinner spinnerCol = (Spinner)findViewById(R.id.spinner_column);
@@ -57,12 +57,17 @@ public class RowAndColumnActivity extends AppCompatActivity
                         .commit();
 
                 //行列番号表示部
-                final int size = R.integer.GridSize;
-                final int margin = R.integer.GridMargin;
+                int size = (int)(MyConverterForDpAndPx.convertDp2Px(
+                        getResources().getInteger(R.integer.GridSize),
+                        this)
+                        + 0.5);
+                size+=(int)(MyConverterForDpAndPx.convertDp2Px(
+                        getResources().getInteger(R.integer.GridMargin),
+                        this)
+                        + 0.5)*2;
                 //列について
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size,size);
-                params.setMargins(margin,0,margin,0);
-                params.gravity = Gravity.BOTTOM;
+                params.gravity = Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL;
                 LinearLayout linear_col = (LinearLayout)findViewById(R.id.LinearLayout_colNums);
                 linear_col.removeAllViews();
                 for(int i=0;i<cols;i++)
@@ -70,13 +75,13 @@ public class RowAndColumnActivity extends AppCompatActivity
                     //追加するテキストview
                     TextView textView = new TextView(this);
                     textView.setText(String.valueOf(i+1));
-                    textView.setGravity(Gravity.BOTTOM);
+                    textView.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL);
                     linear_col.addView(textView,params);
                 }
 
                 //行番号も
-                params.setMargins(0,margin,0,margin);
-                params.gravity = Gravity.RIGHT;
+                params= new LinearLayout.LayoutParams(size,size);
+                params.gravity = Gravity.RIGHT|Gravity.CENTER_VERTICAL;
                 LinearLayout linear_row = (LinearLayout)findViewById(R.id.LinearLayout_rowNums);
                 linear_row.removeAllViews();
                 for(int i=0;i<rows;i++)
@@ -84,7 +89,7 @@ public class RowAndColumnActivity extends AppCompatActivity
                     //追加するテキスト
                     TextView textView = new TextView(this);
                     textView.setText(String.valueOf(i+1));
-                    textView.setGravity(Gravity.RIGHT);
+                    textView.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
                     linear_row.addView(textView,params);
                 }
 

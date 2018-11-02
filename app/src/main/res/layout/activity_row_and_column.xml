@@ -14,8 +14,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -32,8 +32,8 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginTop="0dp"
-            android:layout_marginEnd="3dp"
-            android:layout_marginRight="3dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginRight="0dp"
             android:text="@string/Next"
             android:visibility="visible" />
 
@@ -115,8 +115,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/LinearLayout_input_row_and_column"
-            android:layout_marginStart="42dp"
-            android:layout_marginLeft="42dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginLeft="7dp"
             android:layout_marginTop="-9dp"
             android:layout_toEndOf="@+id/LinearLayout_input_row_and_column"
             android:layout_toRightOf="@+id/LinearLayout_input_row_and_column"
@@ -126,17 +126,19 @@
 
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView_ForGrid"
-        android:layout_width="548dp"
-        android:layout_height="235dp"
-        android:layout_marginStart="80dp"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="72dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
 
         <ScrollView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="left">
 
             <RelativeLayout
@@ -159,11 +161,10 @@
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
 
         <LinearLayout
-            android:id="@+id/LinearLayout_rowNums"
+            android:id="@+id/LinearLayout_colNums"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:minWidth="@string/GridSize"
             android:orientation="horizontal" />
     </HorizontalScrollView>
 
@@ -179,11 +180,10 @@
         app:layout_constraintTop_toTopOf="@+id/horizontalScrollView_ForGrid">
 
         <LinearLayout
-            android:id="@+id/LinearLayout_colNums"
-            android:layout_width="match_parent"
+            android:id="@+id/LinearLayout_rowNums"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:minHeight="@string/GridSize"
             android:orientation="vertical" />
     </ScrollView>
 
