@@ -12,6 +12,9 @@
     <string name="OK">決定</string>
     <string name="Next">次へ</string>
 
+    <string name="Title_PreparingGrid">処理中</string>
+    <string name="Message_PreparingGrid">すこしまってね</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
