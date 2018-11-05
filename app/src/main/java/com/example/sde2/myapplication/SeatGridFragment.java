@@ -4,11 +4,14 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.GridLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -78,6 +81,9 @@ implements ObservableScrollView.ScrollViewListener,
             // 再生成されたときに、すでに受け取っていた引数をメンバ変数にセット
             numRows = getArguments().getInt(ARG_NUM_ROWS);
             numCols = getArguments().getInt(ARG_NUM_COLS);
+        }else{
+            numRows=1;
+            numCols=1;
         }
     }
 
@@ -129,26 +135,53 @@ implements ObservableScrollView.ScrollViewListener,
             }
         }
 
-        //スクロールの設定
+
         //行数表示部の設定
         LockableScrollView VerticalScroll =
-                getActivity().findViewById(R.id.ScrollView_ForRowNum);
+                view.findViewById(R.id.ScrollView_ForRowNum);
         VerticalScroll.setScrollingEnabled(false);
         VerticalScroll.setVerticalScrollBarEnabled(false);
+        //LinearLayoutに行数表示
+        int size = GridSize+Margin*2;
+        LinearLayout linearLayout_row = view.findViewById(R.id.LinearLayout_ForRowNums);
+        linearLayout_row.removeAllViews();
+        for(int i=0;i<numRows;i++)
+        {
+            LinearLayout.LayoutParams layoutParams =
+                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,size);
+            layoutParams.gravity = Gravity.RIGHT|Gravity.CENTER_VERTICAL;
+            TextView textView = new TextView(getActivity());
+            textView.setText(String.valueOf(i+1));
+            textView.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+            linearLayout_row.addView(textView,layoutParams);
+        }
 
         //列数表示部の設定
         LockableHorizontalScrollView HorizontalScroll =
-                getActivity().findViewById(R.id.Horizontal_ForColNum);
+                view.findViewById(R.id.Horizontal_ForColNum);
         HorizontalScroll.setScrollingEnabled(false);
         HorizontalScroll.setHorizontalScrollBarEnabled(false);
+        LinearLayout linearLayout_col =
+                view.findViewById(R.id.LinearLayout_ForColNums);
+        linearLayout_col.removeAllViews();
+        for(int i=0;i<numCols;i++){
+            LinearLayout.LayoutParams layoutParams=
+                    new LinearLayout.LayoutParams(size,LinearLayout.LayoutParams.MATCH_PARENT);
+            layoutParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+            TextView textView = new TextView(getActivity());
+            textView.setText(String.valueOf(i+1));
+            textView.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+            linearLayout_col.addView(textView,layoutParams);
+        }
+
 
         //スクロール通知を受け取る設定
         ObservableScrollView observableScrollView=
-                getActivity().findViewById(R.id.ScrollView_ForGrid);
+                view.findViewById(R.id.ScrollView_ForGrid);
         observableScrollView.setOnScrollViewListener(this);
 
         ObservableHorizontalScrollView observableHorizontalScrollView=
-                getActivity().findViewById(R.id.HorizontalScrollView_ForGrid);
+                view.findViewById(R.id.HorizontalScrollView_ForGrid);
         observableHorizontalScrollView.setOnScrollViewListener(this);
 
         return view;

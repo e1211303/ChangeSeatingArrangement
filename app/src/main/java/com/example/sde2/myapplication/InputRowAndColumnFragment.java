@@ -42,7 +42,7 @@ implements View.OnClickListener {
     //こちらが呼び出して、情報ををActivityに渡してあげる。向こうは実装する必要がある
     //関数名被りしてもいいように、引数に自分のクラス型を入れることにしてみた
     public interface OnFragmentInteractionListener {
-        void onSetRowsAndColumns(InputRowAndColumnFragment fragment,int rows, int columns);
+        void onSetRowsAndColumns(InputRowAndColumnFragment inputRowAndColumnFragment,int rows, int columns);
         void onGoToNext(InputRowAndColumnFragment fragment);
     }
 
