@@ -6,7 +6,7 @@ import android.widget.HorizontalScrollView;
 
 public class ObservableHorizontalScrollView extends HorizontalScrollView {
     public interface ScrollViewListener {
-        void onScrollChanged(ObservableHorizontalScrollView scrollView, int x, int y, int oldx, int oldy);
+        void onScrollChanged(ObservableHorizontalScrollView scrollView, int x, int oldx);
     }
 
     private ScrollViewListener mScrollViewListener = null;
@@ -32,7 +32,7 @@ public class ObservableHorizontalScrollView extends HorizontalScrollView {
     protected void onScrollChanged(int x, int y, int oldx, int oldy) {
         super.onScrollChanged(x, y, oldx, oldy);
         if (mScrollViewListener != null&&lastx!=x) {
-            mScrollViewListener.onScrollChanged(this, x, y, oldx, oldy);
+            mScrollViewListener.onScrollChanged(this, x, oldx);
             lastx=x;
         }
     }

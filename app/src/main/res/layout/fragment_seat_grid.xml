@@ -1,11 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context=".SeatGridFragment">
 
 
     <!--todo スクロール可能なグリッドと行列番号表示-->
+
+    <com.example.sde2.myapplication.ObservableScrollView
+        android:id="@+id/ScrollView_ForGrid"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.example.sde2.myapplication.ObservableHorizontalScrollView
+            android:id="@+id/HorizontalScrollView_ForGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/ScrollView_ForGrid"
+            app:layout_constraintEnd_toEndOf="@+id/ScrollView_ForGrid"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/ScrollView_ForGrid">
+
+            <GridLayout
+                android:id="@+id/GridLayout_checkboxesContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"></GridLayout>
+
+
+        </com.example.sde2.myapplication.ObservableHorizontalScrollView>
+    </com.example.sde2.myapplication.ObservableScrollView>
+
+    <com.example.sde2.myapplication.LockableScrollView
+        android:id="@+id/ScrollView_ForRowNum"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ScrollView_ForGrid"
+        app:layout_constraintEnd_toStartOf="@+id/ScrollView_ForGrid"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ScrollView_ForGrid">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </com.example.sde2.myapplication.LockableScrollView>
+
+    <com.example.sde2.myapplication.LockableHorizontalScrollView
+        android:id="@+id/Horizontal_ForColNum"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/ScrollView_ForGrid"
+        app:layout_constraintEnd_toEndOf="@+id/ScrollView_ForGrid"
+        app:layout_constraintStart_toStartOf="@+id/ScrollView_ForGrid"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" />
+    </com.example.sde2.myapplication.LockableHorizontalScrollView>
+
 
 </android.support.constraint.ConstraintLayout>

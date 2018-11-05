@@ -8,31 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
-    /** クリック連打制御時間(ミリ秒) */
-    private static final long CLICK_DELAY = 1000;
-    /** 前回のクリックイベント実行時間 */
-    private static long mOldClickTime;
-
-    /**
-     * クリックイベントが実行可能か判断する。
-     * @return クリックイベントの実行可否 (true:可, false:否)
-     */
-    public static boolean isClickEvent() {
-        // 現在時間を取得する
-        long time = System.currentTimeMillis();
-
-        // 一定時間経過していなければクリックイベント実行不可
-        if (time - mOldClickTime < CLICK_DELAY) {
-            return false;
-        }
-
-        // 一定時間経過したらクリックイベント実行可能
-        mOldClickTime = time;
-        return true;
-    }
-
+public class MainActivity extends AppCompatActivity implements View.OnClickListener
+{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //何かクリックされた
     public void onClick(View view){
-        if(!isClickEvent())return;
-
-        ((Button)findViewById(R.id.button_continue)).setClickable(false);
+        MyUtil_ForButton.disableButtonForMillisecs((Button)view,1000);
         int id = view.getId();
         switch (id){
             case R.id.button_begin: //始めるボタン

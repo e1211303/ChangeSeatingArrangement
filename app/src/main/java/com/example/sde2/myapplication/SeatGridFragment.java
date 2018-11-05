@@ -18,7 +18,9 @@ import android.widget.GridLayout;
  * Use the {@link SeatGridFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SeatGridFragment extends Fragment {
+public class SeatGridFragment extends Fragment
+implements ObservableScrollView.ScrollViewListener,
+        ObservableHorizontalScrollView.ScrollViewListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_NUM_ROWS = "param1";
@@ -33,6 +35,20 @@ public class SeatGridFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+    }
+
     public SeatGridFragment() {
         // Required empty public constructor
     }
@@ -45,7 +61,6 @@ public class SeatGridFragment extends Fragment {
      * @param numCols Parameter 2.
      * @return A new instance of fragment SeatGridFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static SeatGridFragment newInstance(int numRows, int numCols) {
         SeatGridFragment fragment = new SeatGridFragment();
         // 初めて作られた時の引数を記憶する
@@ -55,7 +70,6 @@ public class SeatGridFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,7 +86,6 @@ public class SeatGridFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        //GridLayoutにチェックボックスを追加
         View view =
                 inflater.inflate(R.layout.fragment_seat_grid, container, false);
 
@@ -87,7 +100,7 @@ public class SeatGridFragment extends Fragment {
             }
         }
         checkBox=null;
-
+        //GridLayoutにチェックボックスを追加
         GridLayout gridLayout =
                 (GridLayout) view.findViewById(R.id.GridLayout_checkboxesContainer);
         gridLayout.removeAllViews();
@@ -116,14 +129,29 @@ public class SeatGridFragment extends Fragment {
             }
         }
 
-        return view;
-    }
+        //スクロールの設定
+        //行数表示部の設定
+        LockableScrollView VerticalScroll =
+                getActivity().findViewById(R.id.ScrollView_ForRowNum);
+        VerticalScroll.setScrollingEnabled(false);
+        VerticalScroll.setVerticalScrollBarEnabled(false);
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+        //列数表示部の設定
+        LockableHorizontalScrollView HorizontalScroll =
+                getActivity().findViewById(R.id.Horizontal_ForColNum);
+        HorizontalScroll.setScrollingEnabled(false);
+        HorizontalScroll.setHorizontalScrollBarEnabled(false);
+
+        //スクロール通知を受け取る設定
+        ObservableScrollView observableScrollView=
+                getActivity().findViewById(R.id.ScrollView_ForGrid);
+        observableScrollView.setOnScrollViewListener(this);
+
+        ObservableHorizontalScrollView observableHorizontalScrollView=
+                getActivity().findViewById(R.id.HorizontalScrollView_ForGrid);
+        observableHorizontalScrollView.setOnScrollViewListener(this);
+
+        return view;
     }
 
     @Override
@@ -143,18 +171,35 @@ public class SeatGridFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    //縦スクロールされた
+    @Override
+    public void onScrollChanged(ObservableScrollView scrollView, int y, int oldy) {
+        int id = scrollView.getId();
+        switch (id){
+            case R.id.ScrollView_ForGrid:
+                //行数表示のスクロールを動かす
+                LockableScrollView lockableScrollView =
+                        getActivity().findViewById(R.id.ScrollView_ForRowNum);
+                lockableScrollView.setScrollY(y);
+                break;
+            default:
+                break;
+        }
+    }
+
+    //横スクロールされた
+    @Override
+    public void onScrollChanged(ObservableHorizontalScrollView scrollView, int x, int oldx) {
+        int id = scrollView.getId();
+        switch (id){
+            case R.id.HorizontalScrollView_ForGrid:
+                //列数表示のスクロールを動かす
+                LockableHorizontalScrollView lockableHorizontalScrollView=
+                        getActivity().findViewById(R.id.Horizontal_ForColNum);
+                lockableHorizontalScrollView.setScrollX(x);
+                break;
+                default:
+                    break;
+        }
     }
 }

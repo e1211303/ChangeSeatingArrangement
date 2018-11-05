@@ -104,7 +104,6 @@ implements View.OnClickListener {
         Spinner spinner_Cols = view.findViewById(R.id.spinner_column);
         spinner_Rows.setAdapter(arrayAdapter_Rows);
         spinner_Cols.setAdapter(arrayAdapter_Cols);
-
         return view;
     }
 
