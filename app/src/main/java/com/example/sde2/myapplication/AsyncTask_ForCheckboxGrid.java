@@ -11,11 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.sde2.myapplication.MyConverterForDpAndPx;
-import com.example.sde2.myapplication.R;
-import com.example.sde2.myapplication.RowAndColumnActivity;
-import com.example.sde2.myapplication.SeatGridFragment;
-
 public class AsyncTask_ForCheckboxGrid extends AsyncTask<Void,Void,Void> {
 
 
@@ -78,10 +73,10 @@ public class AsyncTask_ForCheckboxGrid extends AsyncTask<Void,Void,Void> {
 
 
         //行列番号表示部
-        int size = (int)(MyConverterForDpAndPx.convertDp2Px(
+        int size = (int)(MyUtil_ForDpAndPx.convertDp2Px(
                 context.getResources().getInteger(R.integer.GridSize),context)
                 + 0.5);
-        size += (int)(MyConverterForDpAndPx.convertDp2Px(
+        size += (int)(MyUtil_ForDpAndPx.convertDp2Px(
                 context.getResources().getInteger(R.integer.GridMargin),context)
                 + 0.5)*2;
         //列番号について

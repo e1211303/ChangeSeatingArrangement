@@ -2,21 +2,17 @@ package com.example.sde2.myapplication;
 
 
 import android.net.Uri;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-
-import com.example.sde2.myapplication.AsyncTask_ForCheckboxGrid;
-
 
 
 public class RowAndColumnActivity extends AppCompatActivity
         implements
         View.OnClickListener,
         SeatGridFragment.OnFragmentInteractionListener,
+        InputRowAndColumnFragment.OnFragmentInteractionListener,
         ObservableScrollView.ScrollViewListener,
         ObservableHorizontalScrollView.ScrollViewListener
 {
@@ -50,7 +46,7 @@ public class RowAndColumnActivity extends AppCompatActivity
                 (ObservableHorizontalScrollView)findViewById(R.id.HorizontalScrollView_ForGrid);
         observableHorizontalScrollView.setOnScrollViewListener(this);
     }
-//todo: じかんがかかるのでなんか表示したい
+//todo: FragmentInteractionに移動させる
     public void onClick(View view){
         int id = view.getId();
         switch (id){
@@ -106,5 +102,15 @@ public class RowAndColumnActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    public void onSetRowsAndColumns(InputRowAndColumnFragment fragment,int rows, int columns){
+        //todo 行列数が帰ってきたときの処理
+    }
+
+    @Override
+    public void onGoToNext(InputRowAndColumnFragment fragment){
+        //todo つぎへボタンが押されたとき
     }
 }

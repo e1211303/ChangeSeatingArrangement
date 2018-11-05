@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     tools:context=".SeatGridFragment">
 
 
-    <!--座席のチェックボックス　はじめは空-->
-    <GridLayout
-        android:id="@+id/GridLayout_checkboxesContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        />
-</RelativeLayout>
+    <!--todo スクロール可能なグリッドと行列番号表示-->
+
+</android.support.constraint.ConstraintLayout>

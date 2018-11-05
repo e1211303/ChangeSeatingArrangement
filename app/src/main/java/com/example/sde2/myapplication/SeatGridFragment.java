@@ -3,18 +3,12 @@ package com.example.sde2.myapplication;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Telephony;
 import android.support.v4.app.Fragment;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.GridLayout;
-import android.widget.GridView;
-import android.widget.TextView;
-
-import com.example.sde2.myapplication.MyConverterForDpAndPx;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -100,12 +94,12 @@ public class SeatGridFragment extends Fragment {
         gridLayout.setColumnCount(numCols);
 
         //リソースから
-        final int GridSize = (int)(MyConverterForDpAndPx.convertDp2Px(
+        final int GridSize = (int)(MyUtil_ForDpAndPx.convertDp2Px(
                 getResources().getInteger(R.integer.GridSize),
                 getActivity()
         ) + 0.5);
 
-        final int Margin=(int)(MyConverterForDpAndPx.convertDp2Px(
+        final int Margin=(int)(MyUtil_ForDpAndPx.convertDp2Px(
                 getResources().getInteger(R.integer.GridMargin),
                 getActivity()
         ) + 0.5);

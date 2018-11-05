@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.DisplayMetrics;
 
 
-public class MyConverterForDpAndPx {
+public class MyUtil_ForDpAndPx {
 
 /**
             * dpからpixelへの変換
