@@ -17,13 +17,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         //ようこそのもじれつをセット
-        ((TextView)findViewById(R.id.textView_welcome)).setText(
+        ((TextView)findViewById(R.id.TextView_welcome)).setText(
                 Html.fromHtml(getString(R.string.Welcome_message))
         );
 
         //OnClickListener(このアクティビティ)をセット
-        Button button_begin=(Button)findViewById(R.id.button_begin);
-        Button button_continue = (Button)findViewById(R.id.button_continue);
+        Button button_begin=(Button)findViewById(R.id.Button_begin);
+        Button button_continue = (Button)findViewById(R.id.Button_continue);
         button_begin.setOnClickListener(this);
         button_continue.setOnClickListener(this);
     }
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MyUtil_ForButton.disableButtonForMillisecs((Button)view,1000);
         int id = view.getId();
         switch (id){
-            case R.id.button_begin: //始めるボタン
+            case R.id.Button_begin: //始めるボタン
                 Intent intent =new Intent(getApplication(),RowAndColumnActivity.class);
                 startActivity(intent);
                 break;

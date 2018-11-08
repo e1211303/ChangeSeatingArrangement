@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    tools:context=".InputUsingScopeSettingFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:id="@+id/TextView_ask_to_set_using_scopes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp"
+        android:text="@string/Ask_to_set_using_scopes"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/Button_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/TextView_ask_to_set_using_scopes"
+        android:layout_marginStart="59dp"
+        android:layout_marginLeft="59dp"
+        android:layout_marginTop="0dp"
+        android:layout_toEndOf="@+id/TextView_ask_to_set_using_scopes"
+        android:layout_toRightOf="@+id/TextView_ask_to_set_using_scopes"
+        android:text="@string/Next" />
+
+</RelativeLayout>

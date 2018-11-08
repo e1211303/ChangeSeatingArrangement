@@ -76,8 +76,8 @@ implements View.OnClickListener {
         View view =inflater.inflate(R.layout.fragment_input_row_and_column, container, false);
 
         //ボタンのリスナーをセット
-        Button button_OK = view.findViewById(R.id.button_OK);
-        Button button_Next = view.findViewById(R.id.button_next);
+        Button button_OK = view.findViewById(R.id.Button_OK);
+        Button button_Next = view.findViewById(R.id.Button_next);
         button_OK.setOnClickListener(this);
         button_Next.setOnClickListener(this);
 
@@ -100,10 +100,13 @@ implements View.OnClickListener {
         arrayAdapter_Rows.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         arrayAdapter_Cols.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //スピナーにアダプタをセット
-        Spinner spinner_Rows = view.findViewById(R.id.spinner_row);
-        Spinner spinner_Cols = view.findViewById(R.id.spinner_column);
+        Spinner spinner_Rows = view.findViewById(R.id.Spinner_row);
+        Spinner spinner_Cols = view.findViewById(R.id.Spinner_column);
         spinner_Rows.setAdapter(arrayAdapter_Rows);
         spinner_Cols.setAdapter(arrayAdapter_Cols);
+
+        //次へボタンを無効化
+        ((Button)view.findViewById(R.id.Button_next)).setEnabled(false);
         return view;
     }
 
@@ -111,23 +114,32 @@ implements View.OnClickListener {
     public void onClick(View view) {
 
         //連打禁止
-        MyUtil_ForButton.disableButtonForMillisecs(
-                (Button)view,
-                1000);
+        if(view instanceof Button){
+            MyUtil_ForButton.disableButtonForMillisecs(
+                    (Button)view,
+                    1000);
+        }
 
         int id = view.getId();
         switch (id){
-            case R.id.button_OK:
+            case R.id.Button_OK:
+                //次へボタンをちょっと経ってから有効化
+                MyUtil_ForButton.disableButtonForMillisecs(
+                        (Button) getActivity().findViewById(R.id.Button_next),
+                        1000);
+                
                 if(mListener == null)break;
                 //スピナーの値を読んで返す
-                Spinner spinner_rows = getActivity().findViewById(R.id.spinner_row);
-                Spinner spinner_cols = getActivity().findViewById(R.id.spinner_column);
+                Spinner spinner_rows = getActivity().findViewById(R.id.Spinner_row);
+                Spinner spinner_cols = getActivity().findViewById(R.id.Spinner_column);
                 int rows = (int)spinner_rows.getSelectedItem();
                 int cols = (int)spinner_cols.getSelectedItem();
                 mListener.onSetRowsAndColumns(this,rows,cols);
+
+
                 break;
 
-            case R.id.button_next:
+            case R.id.Button_next:
                 //決定ボタンが押されたことを通知
                 mListener.onGoToNext(this);
 

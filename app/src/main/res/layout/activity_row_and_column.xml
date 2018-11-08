@@ -8,7 +8,7 @@
 
 
     <RelativeLayout
-        android:id="@+id/relativeLayout_ForInputPrompt"
+        android:id="@+id/RelativeLayout_ForInputPrompt"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:minHeight="30dp"
@@ -25,7 +25,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/RelativeLayout_ForDisplayGrid"
+        android:id="@+id/RelativeLayout_For_Display_Bottom"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -36,7 +36,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout_ForInputPrompt">
+        app:layout_constraintTop_toBottomOf="@+id/RelativeLayout_ForInputPrompt">
 
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

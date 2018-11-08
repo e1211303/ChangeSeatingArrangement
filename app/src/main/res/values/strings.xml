@@ -4,7 +4,9 @@
     <string name="Start">始める</string>
     <string name="Continue">続きから</string>
 
-    <string name="Ask_for_row_and_column">大きさを決定し、空席を除外</string>
+    <string name="Ask_for_num_of_row_and_column">大きさを決定し、空席を除外</string>
+    <string name="Ask_to_set_using_scopes">使用するスコープを設定</string>
+
     <string name="Num_of_row">行数</string>
     <string name="Unit_of_row">行</string>
     <string name="Num_of_column">列数</string>
@@ -17,5 +19,6 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
 
 </resources>

@@ -1,5 +1,6 @@
 package com.example.sde2.myapplication;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
@@ -92,6 +94,7 @@ implements ObservableScrollView.ScrollViewListener,
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         View view =
                 inflater.inflate(R.layout.fragment_seat_grid, container, false);
 
@@ -234,5 +237,16 @@ implements ObservableScrollView.ScrollViewListener,
                 default:
                     break;
         }
+    }
+
+    //チェックボックスの状態を返す
+    public boolean[][] getSeatState(){
+        boolean[][] ret=new boolean[numRows][numRows];
+        for(int i=0;i<numRows;i++){
+            for(int j=0;j<numCols;j++){
+                ret[i][j] = checkBoxes[i][j].isChecked();
+            }
+        }
+        return ret;
     }
 }
