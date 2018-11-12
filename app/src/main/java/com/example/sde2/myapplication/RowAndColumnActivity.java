@@ -69,14 +69,19 @@ public class RowAndColumnActivity extends AppCompatActivity
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.RelativeLayout_ForInputPrompt,inputUsingScopeSettingFragment)
+                .replace(R.id.RelativeLayout_ForInputPrompt,inputUsingScopeSettingFragment,TAG_SCOPE)
                 .commit();
 
         //空席状態を取得
         boolean[][] seatState =
-                ((SeatGridFragment)seatGridFragment).getSeatState();
+                ((SeatGridFragment)seatGridFragment).getIsCheckedAll();
+
+        //test
+        ((SeatGridFragment) seatGridFragment).setIsCheckedAll(false);
+
 
         //todo 下部fragmentの差し替え
+
     }
 
     //スコープ設定の次へで

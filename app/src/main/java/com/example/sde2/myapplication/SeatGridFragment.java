@@ -98,6 +98,65 @@ implements ObservableScrollView.ScrollViewListener,
         View view =
                 inflater.inflate(R.layout.fragment_seat_grid, container, false);
 
+        //todo 別関数にして何度も呼べるように
+        prepareSeatGrid(numRows,numCols,false,view);
+        return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    //縦スクロールされた
+    @Override
+    public void onScrollChanged(ObservableScrollView scrollView, int y, int oldy) {
+        int id = scrollView.getId();
+        switch (id){
+            case R.id.ScrollView_ForGrid:
+                //行数表示のスクロールを動かす
+                LockableScrollView lockableScrollView =
+                        getActivity().findViewById(R.id.ScrollView_ForRowNum);
+                lockableScrollView.setScrollY(y);
+                break;
+            default:
+                break;
+        }
+    }
+
+    //横スクロールされた
+    @Override
+    public void onScrollChanged(ObservableHorizontalScrollView scrollView, int x, int oldx)
+    {
+        int id = scrollView.getId();
+        switch (id)
+        {
+            case R.id.HorizontalScrollView_ForGrid:
+                //列数表示のスクロールを動かす
+                LockableHorizontalScrollView lockableHorizontalScrollView=
+                        getActivity().findViewById(R.id.Horizontal_ForColNum);
+                lockableHorizontalScrollView.setScrollX(x);
+                break;
+                default:
+                    break;
+        }
+    }
+
+    //todo 設定値で座席表を作成する関数
+    public void prepareSeatGrid(int rows,int cols,boolean isChecked, View view)
+    {
         // チェックボックス用意
         checkBoxes = new CheckBox[numRows][numCols]; //1次元に？
         CheckBox checkBox;
@@ -186,61 +245,30 @@ implements ObservableScrollView.ScrollViewListener,
         ObservableHorizontalScrollView observableHorizontalScrollView=
                 view.findViewById(R.id.HorizontalScrollView_ForGrid);
         observableHorizontalScrollView.setOnScrollViewListener(this);
-
-        return view;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+    //チェックボックスをすべてチェックつけたり外したり
+    public void setIsCheckedAll(boolean isChecked)
+    {
+        for(int i=0;i<numRows;i++){
+            for(int j=0;j<numCols;j++){
+                checkBoxes[i][j].setChecked(isChecked);
+            }
         }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
+    public boolean setIsChecked(int row,int column,boolean isChecked)
+    {
+        if(!(0<=row&&row<numRows && 0<=column&&column<numCols))return false;
+        checkBoxes[row][column].setChecked(isChecked);
+        return true;
     }
+    
 
-    //縦スクロールされた
-    @Override
-    public void onScrollChanged(ObservableScrollView scrollView, int y, int oldy) {
-        int id = scrollView.getId();
-        switch (id){
-            case R.id.ScrollView_ForGrid:
-                //行数表示のスクロールを動かす
-                LockableScrollView lockableScrollView =
-                        getActivity().findViewById(R.id.ScrollView_ForRowNum);
-                lockableScrollView.setScrollY(y);
-                break;
-            default:
-                break;
-        }
-    }
-
-    //横スクロールされた
-    @Override
-    public void onScrollChanged(ObservableHorizontalScrollView scrollView, int x, int oldx) {
-        int id = scrollView.getId();
-        switch (id){
-            case R.id.HorizontalScrollView_ForGrid:
-                //列数表示のスクロールを動かす
-                LockableHorizontalScrollView lockableHorizontalScrollView=
-                        getActivity().findViewById(R.id.Horizontal_ForColNum);
-                lockableHorizontalScrollView.setScrollX(x);
-                break;
-                default:
-                    break;
-        }
-    }
 
     //チェックボックスの状態を返す
-    public boolean[][] getSeatState(){
+    public boolean[][] getIsCheckedAll()
+    {
         boolean[][] ret=new boolean[numRows][numRows];
         for(int i=0;i<numRows;i++){
             for(int j=0;j<numCols;j++){
