@@ -56,31 +56,31 @@ public class RowAndColumnActivity extends AppCompatActivity
     public void onGoToNext(InputRowAndColumnFragment fragment)
     {
         //下部のグリッドを取得できるか
-        Fragment seatGridFragment=
+        Fragment fragmentBottom=
                 getSupportFragmentManager()
                         .findFragmentByTag(TAG_SEAT_GRID);
-        if(!(seatGridFragment instanceof SeatGridFragment))
+        if(!(fragmentBottom instanceof SeatGridFragment))
             return; //何もせず
 
+        SeatGridFragment seatGridFragment = (SeatGridFragment)fragmentBottom;
 
         //入力部fragment差し替え
         InputUsingScopeSettingFragment inputUsingScopeSettingFragment=
                 new InputUsingScopeSettingFragment();
-
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.RelativeLayout_ForInputPrompt,inputUsingScopeSettingFragment,TAG_SCOPE)
                 .commit();
 
         //空席状態を取得
-        boolean[][] seatState =
-                ((SeatGridFragment)seatGridFragment).getIsCheckedAll();
+        Boolean[][] seatState =
+                seatGridFragment.getIsCheckedAll();
+        //todo falseのところをnullに
 
-        //test
-        ((SeatGridFragment) seatGridFragment).setIsCheckedAll(false);
+        
+        seatGridFragment.prepareSeatGrid(seatState.length,seatState[0].length,seatState,null);
 
 
-        //todo 下部fragmentの差し替え
 
     }
 

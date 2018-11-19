@@ -36,7 +36,7 @@ implements ObservableScrollView.ScrollViewListener,
     private int numRows=0;
     private int numCols=0;
 
-    CheckBox[][] checkBoxes;
+    private CheckBox[][] checkBoxes;
 
     private OnFragmentInteractionListener mListener;
 
@@ -99,7 +99,7 @@ implements ObservableScrollView.ScrollViewListener,
                 inflater.inflate(R.layout.fragment_seat_grid, container, false);
 
         //todo 別関数にして何度も呼べるように
-        prepareSeatGrid(numRows,numCols,false,view);
+        prepareSeatGrid(numRows,numCols,null,view);
         return view;
     }
 
@@ -128,7 +128,7 @@ implements ObservableScrollView.ScrollViewListener,
             case R.id.ScrollView_ForGrid:
                 //行数表示のスクロールを動かす
                 LockableScrollView lockableScrollView =
-                        getActivity().findViewById(R.id.ScrollView_ForRowNum);
+                        getView().findViewById(R.id.ScrollView_ForRowNum);
                 lockableScrollView.setScrollY(y);
                 break;
             default:
@@ -146,7 +146,7 @@ implements ObservableScrollView.ScrollViewListener,
             case R.id.HorizontalScrollView_ForGrid:
                 //列数表示のスクロールを動かす
                 LockableHorizontalScrollView lockableHorizontalScrollView=
-                        getActivity().findViewById(R.id.Horizontal_ForColNum);
+                        getView().findViewById(R.id.Horizontal_ForColNum);
                 lockableHorizontalScrollView.setScrollX(x);
                 break;
                 default:
@@ -154,16 +154,42 @@ implements ObservableScrollView.ScrollViewListener,
         }
     }
 
-    //todo 設定値で座席表を作成する関数
-    public void prepareSeatGrid(int rows,int cols,boolean isChecked, View view)
+    //設定値で座席表を作成する関数
+    public void prepareSeatGrid(int rows,int cols,Boolean[][] seatState,View view)
     {
+        numRows = rows;
+        numCols = cols;
+
+        //すべてチェック
+        if ( seatState == null)
+        {
+            seatState = new Boolean[numRows][numCols];
+            for(int i=0;i<numRows;i++){
+                for(int j=0;j<numCols;j++){
+                    seatState[i][j] = true;
+                }
+            }
+        }
+
+        //todo これでいいか？
+        if(view == null){
+            view = getView();
+        }
+
         // チェックボックス用意
         checkBoxes = new CheckBox[numRows][numCols]; //1次元に？
         CheckBox checkBox;
         for (int i=0;i<numRows;i++) {
             for (int j=0;j<numCols;j++) {
                 checkBox = new CheckBox(getActivity());
-                checkBox.setChecked(true);
+                //nullで無効、真偽値があればそれに従う
+                if(seatState[i][j]==null){
+                    checkBox.setChecked(false);
+                    checkBox.setEnabled(false);
+                }else{
+                    checkBox.setChecked(seatState[i][j].booleanValue());
+                    checkBox.setEnabled(true);
+                }
                 checkBoxes[i][j]=checkBox;
             }
         }
@@ -247,32 +273,44 @@ implements ObservableScrollView.ScrollViewListener,
         observableHorizontalScrollView.setOnScrollViewListener(this);
     }
 
-    //チェックボックスをすべてチェックつけたり外したり
-    public void setIsCheckedAll(boolean isChecked)
+    //チェックボックスをすべてチェックつけたり外したり(無効なもの以外)
+    public void setSeatStates(boolean isChecked)
     {
         for(int i=0;i<numRows;i++){
             for(int j=0;j<numCols;j++){
+                if(checkBoxes[i][j].isEnabled() == false)continue;
                 checkBoxes[i][j].setChecked(isChecked);
             }
         }
     }
 
-    public boolean setIsChecked(int row,int column,boolean isChecked)
+    //1つのチェックを操作
+    public Boolean setIsChecked(int row,int column,boolean isChecked)
     {
         if(!(0<=row&&row<numRows && 0<=column&&column<numCols))return false;
+        if(checkBoxes[row][column].isEnabled() == false)return false;
+
         checkBoxes[row][column].setChecked(isChecked);
         return true;
     }
     
 
 
-    //チェックボックスの状態を返す
-    public boolean[][] getIsCheckedAll()
+    //チェックボックスの状態を返す 無効ならnull
+    public Boolean[][] getIsCheckedAll()
     {
-        boolean[][] ret=new boolean[numRows][numRows];
+        Boolean[][] ret = new Boolean[numRows][numRows];
         for(int i=0;i<numRows;i++){
             for(int j=0;j<numCols;j++){
-                ret[i][j] = checkBoxes[i][j].isChecked();
+                if(checkBoxes[i][j].isEnabled()==true)
+                {
+                    ret[i][j] = checkBoxes[i][j].isChecked();
+                }
+                else
+                {
+                    ret[i][j]=null;
+                }
+
             }
         }
         return ret;
