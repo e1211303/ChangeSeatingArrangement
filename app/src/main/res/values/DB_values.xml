@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--リソースでリソースを参照できるか？-->
+
+<resources>
+    <!--ファイル名-->
+    <string name="DB_FileName">SeatGrid.db</string>
+
+    <!--データベースバージョン（よくわかってない）-->
+    <integer name="DB_Version">1</integer>
+
+    <!--テーブル名-->
+    <string name="DB_TableName_SeatGrid">SEATGRID_TABLE</string>
+    <string name="DB_TableName_SeatState">SEATSTATE_TABLE</string>
+
+    <!--CREATE TABLE-->
+    <string name="DB_Query_CreateTable_SeatGrid">
+        CREATE TABLE SEATGRID_TABLE (
+            _ID INTEGER PRIMARY KEY AUTO_INCREMENT,
+            GRID_NAME TEXT NOT NULL,
+            ROWS INTEGER,
+            COLS INTEGER
+        );
+    </string>
+
+    <string name="DB_Query_CreateTable_SeatState">
+        CREATE TABLE SEATSTATE_TABLE (
+            _ID INTEGER,
+            ROW INTEGER,
+            COL INTEGER,
+            IS_ENABLED BOOLEAN,
+            IS_SCOPED BOOLEAN,
+            IS_EMPTY BOOLEAN,
+            STUDENT_ID INT,
+            PRIMARY KEY (_ID,ROW,COL)
+        );
+    </string>
+
+    <!--DROP TABLE-->
+    <string name="DB_Query_DropTable_SeatGrid">
+        DROP TABLE SEATGRID_TABLE;
+    </string>
+
+    <string name="DB_Query_DropTable_SeatState">
+        DROP TABLE SEATSTATE_TABLE;
+    </string>
+
+
+    
+</resources>

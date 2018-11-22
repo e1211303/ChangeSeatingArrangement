@@ -1,6 +1,9 @@
 package com.example.sde2.myapplication;
 
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -75,11 +78,22 @@ public class RowAndColumnActivity extends AppCompatActivity
         //空席状態を取得
         Boolean[][] seatState =
                 seatGridFragment.getIsCheckedAll();
-        //todo falseのところをnullに
+        //falseのところをnullに
+        final int rows = seatState.length;
+        final int cols = seatState[0].length;
+        for(int i=0;i<rows;i++){
+            for(int j=0;j<cols;j++){
+                Boolean b = seatState[i][j];
+                if(b != null && b.booleanValue() == false){
+                    seatState[i][j] = null;
+                }
+            }
+        }
 
-        
-        seatGridFragment.prepareSeatGrid(seatState.length,seatState[0].length,seatState,null);
-
+        //空席部分以外のGridを表示
+        seatGridFragment.prepareSeatGrid(rows,cols,seatState,null);
+        //チェックを外す
+        seatGridFragment.setIsCheckedAll(false);
 
 
     }
@@ -87,6 +101,38 @@ public class RowAndColumnActivity extends AppCompatActivity
     //スコープ設定の次へで
     @Override
     public void onGoToNext(InputUsingScopeSettingFragment fragment){
+        //下部のグリッドを取得できるか
+        Fragment fragmentBottom=
+                getSupportFragmentManager()
+                        .findFragmentByTag(TAG_SEAT_GRID);
+        if(!(fragmentBottom instanceof SeatGridFragment))
+            return; //何もせず
 
+        SeatGridFragment seatGridFragment = (SeatGridFragment)fragmentBottom;
+
+        //席状態取得
+        Boolean[][] seatStates =
+                seatGridFragment.getIsCheckedAll();
+
+        final int rows = seatStates.length;
+        final int cols = seatStates[0].length;
+
+        //todo Gridの名前を聞いてDBに保存
+//
+//        //DB準備
+//        MySQLiteOpenHelperForSeatGrid helperForSeatGrid =
+//                new MySQLiteOpenHelperForSeatGrid(getApplicationContext());
+//        //DBインスタンス取得
+//        SQLiteDatabase DB_SeatGrid = helperForSeatGrid.getWritableDatabase();
+    }
+
+    //DB操作用
+    private HelperForSeatGrid mHelperForSeatGrid;
+    private SQLiteDatabase db;
+
+    private void setDataBase()
+    {
+        mHelperForSeatGrid = new HelperForSeatGrid(getApplicationContext());
+        db = mHelperForSeatGrid.openDatabase
     }
 }

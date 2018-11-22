@@ -274,7 +274,7 @@ implements ObservableScrollView.ScrollViewListener,
     }
 
     //チェックボックスをすべてチェックつけたり外したり(無効なもの以外)
-    public void setSeatStates(boolean isChecked)
+    public void setIsCheckedAll(boolean isChecked)
     {
         for(int i=0;i<numRows;i++){
             for(int j=0;j<numCols;j++){
