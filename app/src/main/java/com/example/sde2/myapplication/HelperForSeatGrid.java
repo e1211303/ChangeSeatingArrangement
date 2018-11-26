@@ -38,10 +38,12 @@ public class HelperForSeatGrid extends SQLiteOpenHelper {
     {
         //todo テーブル全部作る
         db.execSQL(CreateTable_SeatGrid);
+        db.execSQL(CreateTable_SeatState);
     }
 
     public void onUpgrade(SQLiteDatabase db,int oldVersion,int newVersion){
-        db.execSQL(DropTable);
+        db.execSQL(DropTable_SeatGrid);
+        db.execSQL(DropTable_SeatState);
         onCreate(db);
     }
 }

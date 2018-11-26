@@ -12,6 +12,21 @@
     <string name="DB_TableName_SeatGrid">SEATGRID_TABLE</string>
     <string name="DB_TableName_SeatState">SEATSTATE_TABLE</string>
 
+    <!--SeatGridの列名-->
+    <string name="DB_ColName_SeatGrid_ID">_ID</string>
+    <string name="DB_ColName_SeatGrid_Name">GRID_NAME</string>
+    <string name="DB_ColName_SeatGrid_Rows">ROWS</string>
+    <string name="DB_ColName_SeatGrid_Cols">COLS</string>
+
+    <!--SeatStateの列名-->
+    <string name="DB_ColName_SeatState_ID">_ID</string>
+    <string name="DB_ColName_SeatState_Row">ROW</string>
+    <string name="DB_ColName_SeatState_Col">COL</string>
+    <string name="DB_ColName_SeatState_isEnabled">IS_ENABLED</string>
+    <string name="DB_ColName_SeatState_isScoped">IS_SCOPED</string>
+    <string name="DB_ColName_SeatState_isEmpty">IS_EMPTY</string>
+    <string name="DB_ColName_SeatState_StudentID">STUDENT_ID</string>
+
     <!--CREATE TABLE-->
     <string name="DB_Query_CreateTable_SeatGrid">
         CREATE TABLE SEATGRID_TABLE (

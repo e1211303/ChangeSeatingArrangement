@@ -1,6 +1,7 @@
 package com.example.sde2.myapplication;
 
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -129,10 +130,36 @@ public class RowAndColumnActivity extends AppCompatActivity
     //DB操作用
     private HelperForSeatGrid mHelperForSeatGrid;
     private SQLiteDatabase db;
+    private final String TableName_SeatGrid =
+            getResources().getString(R.string.DB_TableName_SeatGrid);
+    private final String TableName_SeatState =
+            getResources().getString(R.string.DB_TableName_SeatState);
 
     private void setDataBase()
     {
         mHelperForSeatGrid = new HelperForSeatGrid(getApplicationContext());
-        db = mHelperForSeatGrid.openDatabase
+        db = mHelperForSeatGrid.getWritableDatabase();
+    }
+
+    //座席状態で保存。いつかは人名入り
+    private boolean addSeatGrid(Boolean[][] seatStates,String GridName){
+        if(db==null) return false;
+        if(seatStates==null) return false;
+
+        //SeatGrid分
+        ContentValues values_SeatGrid = new ContentValues();
+        values_SeatGrid.put(getResources().getString(R.string.DB_ColName_SeatGrid_Name),GridName);
+        values_SeatGrid.put(getResources().getString(R.string.DB_ColName_SeatGrid_Rows),seatStates.length);
+        values_SeatGrid.put(getResources().getString(R.string.DB_ColName_SeatGrid_Cols),seatStates[0].length);
+        long ret = db.insert(TableName_SeatGrid,null,values_SeatGrid);
+        if(ret == -1)return false;
+
+        //SeatState分
+        for(Boolean[] bools : seatStates){
+            for(Boolean b : bools){
+                // todo 上で取得したGridに紐づけながら追加
+            }
+        }
+
     }
 }
