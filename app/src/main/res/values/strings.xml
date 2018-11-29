@@ -17,7 +17,7 @@
     <string name="Title_PreparingGrid">処理中</string>
     <string name="Message_PreparingGrid">すこしまってね</string>
 
-
+    <string name="Ask_for_GridName">座席表の名前を入力</string>
 
 
 </resources>
