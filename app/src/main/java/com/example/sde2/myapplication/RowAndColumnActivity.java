@@ -1,15 +1,19 @@
 package com.example.sde2.myapplication;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.support.constraint.solver.widgets.Helper;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -105,8 +109,8 @@ public class RowAndColumnActivity extends AppCompatActivity
     }
 
     //DB操作用
-    private HelperForSeatGridDB mHelperForSeatGrid;
-    private SQLiteDatabase db;
+    private HelperForSeatGridDB mHelperForSeatGrid=null;
+    private SQLiteDatabase db=null;
 
     //スコープ設定の次へで
     @Override
@@ -128,29 +132,49 @@ public class RowAndColumnActivity extends AppCompatActivity
         final int rows = seatStates.length;
         final int cols = seatStates[0].length;
 
-        //todo Gridの名前を聞いてDBに保存
+        //Gridの名前を聞いてDBに保存
         LayoutInflater inflater =
                 LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.dialog_edit_text,null);
-        final EditText editText = (EditText)findViewById(R.id.EditText_ForDialog);
+        final EditText editText = (EditText)view.findViewById(R.id.EditText_ForDialog);
 
         //DB準備
         setDataBase();
 
         //OK押したらDBに追加する
-        new AlertDialog.Builder(this)
+        final Context context = this;
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(context)
                 .setTitle(getResources().getString(R.string.Ask_for_GridName))
-                .setView(view)
-                .setPositiveButton(getResources().getString(R.string.OK),
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String GridName = editText.getText().toString();
-                                saveSeatState(seatStates,GridName);
-                                // todo 戻り値をとれないのが気になる
-                            }
-                        })
+                .setView(view);
+
+        alertDialog.setPositiveButton(getResources().getString(R.string.OK),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String GridName = editText.getText().toString();
+                        saveSeatState(seatStates,GridName);
+                        //席情報を保存
+                        long GridID = saveSeatState(seatStates,GridName);
+                        if(GridID != -1){
+                            // todo このactivity終了（席情報を渡して）
+                            Log.i("DB登録","追加成功");
+                            Intent data = new Intent();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("GridID",String.valueOf(GridID));
+                            data.putExtras(bundle);
+
+                            setResult(Activity.RESULT_OK,data);
+                            finish();
+                        }else{
+                            //todo alartdialogでメッセージ　何もしない
+                            new AlertDialog.Builder(context)
+                                    .setTitle(getResources().getString(R.string.Title_SeatGrid_CouldNotBeAdded))
+                                    .show();
+                        }
+                    }
+                })
                 .show();
+
     }
 
 
@@ -162,10 +186,11 @@ public class RowAndColumnActivity extends AppCompatActivity
         db = mHelperForSeatGrid.getWritableDatabase();
     }
 
+    //todo なんか2回呼ばれる
     //座席状態で保存。いつかは人名入り
-    private boolean saveSeatState(final Boolean[][] seatStates,final String GridName){
-        if(db==null) return false;
-        if(seatStates==null) return false;
+    private long saveSeatState(final Boolean[][] seatStates,final String GridName){
+        if(db==null) return -1;
+        if(seatStates==null) return -1;
 
         int rows = seatStates.length;
         int cols = seatStates[0].length;
@@ -178,13 +203,13 @@ public class RowAndColumnActivity extends AppCompatActivity
 
         //トランザクション開始
         db.beginTransaction();
-        long ret = //insertされた列の_idが返ってくる？
+        final long GridID = //insertされた列の_idが返ってくる？
                 db.insert(HelperForSeatGridDB.SeatGridConstants.TableName,
                         null,
                         values_SeatGrid);
-        if(ret == -1){
+        if(GridID == -1){
             db.endTransaction();
-            return false;
+            return -1;
         }
 
         //SeatState分
@@ -192,6 +217,7 @@ public class RowAndColumnActivity extends AppCompatActivity
             for(int j=0;j<cols;j++){
                 //座席状態一つ追加
                 ContentValues values_SeatState = new ContentValues();
+                values_SeatState.put(HelperForSeatGridDB.SeatStateConstants.ColName_ID,GridID);
                 values_SeatState.put(HelperForSeatGridDB.SeatStateConstants.ColName_Row,i);
                 values_SeatState.put(HelperForSeatGridDB.SeatStateConstants.ColName_Col,j);
 
@@ -216,15 +242,16 @@ public class RowAndColumnActivity extends AppCompatActivity
                 values_SeatState.put(HelperForSeatGridDB.SeatStateConstants.ColName_StudentID,"");
 
                 //挿入
-                ret = db.insert(HelperForSeatGridDB.SeatStateConstants.TableName,null,values_SeatState);
-                if(ret !=0){
+                long ret = db.insert(HelperForSeatGridDB.SeatStateConstants.TableName,null,values_SeatState);
+                if(ret == -1){
                     db.endTransaction();
-                    return false;
+                    return -1;
                 }
             }
         }
         //コミットされる
         db.setTransactionSuccessful();
-        return true;
+        db.endTransaction();
+        return GridID;
     }
 }

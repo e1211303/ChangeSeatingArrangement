@@ -35,7 +35,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (id){
             case R.id.Button_begin: //始めるボタン
                 Intent intent =new Intent(getApplication(),RowAndColumnActivity.class);
-                startActivity(intent);
+                int requestCode = 11; //適当
+                startActivityForResult(intent,requestCode);
                 break;
         }
 

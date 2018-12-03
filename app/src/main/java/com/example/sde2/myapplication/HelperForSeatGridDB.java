@@ -55,7 +55,7 @@ public class HelperForSeatGridDB extends SQLiteOpenHelper {
                         ColName_isEnabled + " BOOLEAN,"+
                         ColName_isScoped + " BOOLEAN," +
                         ColName_StudentID + " TEXT," +
-                        "PRIMARY KEY ("+ (ColName_ID+ColName_Row+ColName_Col) +")"+
+                        "PRIMARY KEY (" + ColName_ID + "," + ColName_Row + "," + ColName_Col + ")"+
                         ");";
 
         public static final String Query_DropTable = "DROP TABLE "+TableName+";";

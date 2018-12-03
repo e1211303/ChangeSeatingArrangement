@@ -299,7 +299,7 @@ implements ObservableScrollView.ScrollViewListener,
     //チェックボックスの状態を返す 無効ならnull
     public Boolean[][] getIsCheckedAll()
     {
-        Boolean[][] ret = new Boolean[numRows][numRows];
+        Boolean[][] ret = new Boolean[numRows][numCols];
         for(int i=0;i<numRows;i++){
             for(int j=0;j<numCols;j++){
                 if(checkBoxes[i][j].isEnabled()==true)

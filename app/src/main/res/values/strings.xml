@@ -18,6 +18,7 @@
     <string name="Message_PreparingGrid">すこしまってね</string>
 
     <string name="Ask_for_GridName">座席表の名前を入力</string>
+    <string name="Title_SeatGrid_CouldNotBeAdded">座席表作成に失敗</string>
 
 
 </resources>
