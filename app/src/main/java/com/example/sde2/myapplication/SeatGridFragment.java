@@ -1,19 +1,20 @@
 package com.example.sde2.myapplication;
 
-import android.app.ProgressDialog;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.constraint.solver.ArrayLinkedVariables;
+import android.support.constraint.solver.widgets.Helper;
 import android.support.v4.app.Fragment;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.GridLayout;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,36 +24,15 @@ import android.widget.TextView;
  * Use the {@link SeatGridFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SeatGridFragment extends Fragment
-implements ObservableScrollView.ScrollViewListener,
-        ObservableHorizontalScrollView.ScrollViewListener {
+public class SeatGridFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_NUM_ROWS = "param1";
-    private static final String ARG_NUM_COLS = "param2";
+    public static final String ARG_GridID = "param1";
 
     // TODO: Rename and change types of parameters
-    // 行数と列数の記憶
-    private int numRows=0;
-    private int numCols=0;
-
-    private CheckBox[][] checkBoxes;
+    private long mGridID = -1;
 
     private OnFragmentInteractionListener mListener;
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-    }
 
     public SeatGridFragment() {
         // Required empty public constructor
@@ -62,16 +42,15 @@ implements ObservableScrollView.ScrollViewListener,
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param numRows Parameter 1.
-     * @param numCols Parameter 2.
+     *
+     * @param GridID
      * @return A new instance of fragment SeatGridFragment.
      */
-    public static SeatGridFragment newInstance(int numRows, int numCols) {
+    // TODO: Rename and change types and number of parameters
+    public static SeatGridFragment newInstance(long GridID) {
         SeatGridFragment fragment = new SeatGridFragment();
-        // 初めて作られた時の引数を記憶する
         Bundle args = new Bundle();
-        args.putInt(ARG_NUM_ROWS, numRows);
-        args.putInt(ARG_NUM_COLS, numCols);
+        args.putLong(ARG_GridID,GridID);
         fragment.setArguments(args);
         return fragment;
     }
@@ -80,27 +59,28 @@ implements ObservableScrollView.ScrollViewListener,
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            // 再生成されたときに、すでに受け取っていた引数をメンバ変数にセット
-            numRows = getArguments().getInt(ARG_NUM_ROWS);
-            numCols = getArguments().getInt(ARG_NUM_COLS);
-        }else{
-            numRows=1;
-            numCols=1;
+            //状態を復元
+            mGridID = getArguments().getLong(ARG_GridID);
         }
     }
 
-    //onCreateの直後
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_seat_grid, container, false);
 
-        View view =
-                inflater.inflate(R.layout.fragment_seat_grid, container, false);
+        //todo DBの情報をもとにGrid用意
 
-        //todo 別関数にして何度も呼べるように
-        prepareSeatGrid(numRows,numCols,null,view);
+
         return view;
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
     }
 
     @Override
@@ -120,199 +100,102 @@ implements ObservableScrollView.ScrollViewListener,
         mListener = null;
     }
 
-    //縦スクロールされた
-    @Override
-    public void onScrollChanged(ObservableScrollView scrollView, int y, int oldy) {
-        int id = scrollView.getId();
-        switch (id){
-            case R.id.ScrollView_ForGrid:
-                //行数表示のスクロールを動かす
-                LockableScrollView lockableScrollView =
-                        getView().findViewById(R.id.ScrollView_ForRowNum);
-                lockableScrollView.setScrollY(y);
-                break;
-            default:
-                break;
-        }
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
     }
 
-    //横スクロールされた
-    @Override
-    public void onScrollChanged(ObservableHorizontalScrollView scrollView, int x, int oldx)
-    {
-        int id = scrollView.getId();
-        switch (id)
-        {
-            case R.id.HorizontalScrollView_ForGrid:
-                //列数表示のスクロールを動かす
-                LockableHorizontalScrollView lockableHorizontalScrollView=
-                        getView().findViewById(R.id.Horizontal_ForColNum);
-                lockableHorizontalScrollView.setScrollX(x);
-                break;
-                default:
-                    break;
+    private HelperForSeatGridDB mHelper=null;
+
+    private boolean prepareSeatGrid(long GridID,View view){
+        if(mHelper == null)
+            mHelper = new HelperForSeatGridDB(getActivity().getApplicationContext());
+        SQLiteDatabase db = mHelper.getReadableDatabase();
+
+        //todo データベースから情報と取り出す
+
+        //SeatGridについて
+        //列名
+        String TableName = HelperForSeatGridDB.SeatGridConstants.TableName;
+        String Col_ID = HelperForSeatGridDB.SeatGridConstants.ColName_ID;
+        String Col_Name = HelperForSeatGridDB.SeatGridConstants.ColName_Name;
+        String Col_Rows = HelperForSeatGridDB.SeatGridConstants.ColName_Rows;
+        String Col_Cols = HelperForSeatGridDB.SeatGridConstants.ColName_Cols;
+
+        //IDに対応したSeatGrid取得
+        Cursor cursor = db.query(TableName,
+                null,
+                Col_ID + "=?",
+                new String[]{String.valueOf(GridID)},
+                null,null,null);
+
+        Bundle SeatGridItems = new Bundle();
+        try{
+            if(cursor.moveToNext()==true){
+                //表の名前
+                String str = cursor.getString(cursor.getColumnIndex(Col_Name));
+                SeatGridItems.putString(Col_Name,str);
+                //行数
+                str = cursor.getString(cursor.getColumnIndex(Col_Rows));
+                SeatGridItems.putString(Col_Rows,str);
+                //列数
+                str = cursor.getString(cursor.getColumnIndex(Col_Cols));
+                SeatGridItems.putString(Col_Cols,str);
+
+            }
+        }catch (Exception e){
+            SeatGridItems = null;
+        }finally{
+            cursor.close();
         }
-    }
 
-    //設定値で座席表を作成する関数
-    public void prepareSeatGrid(int rows,int cols,Boolean[][] seatState,View view)
-    {
-        numRows = rows;
-        numCols = cols;
+        if(SeatGridItems == null){
+            //表を取得できなかった
+            return false;
+        }
 
-        //すべてチェック
-        if ( seatState == null)
-        {
-            seatState = new Boolean[numRows][numCols];
-            for(int i=0;i<numRows;i++){
-                for(int j=0;j<numCols;j++){
-                    seatState[i][j] = true;
+        int rows = Integer.parseInt(SeatGridItems.getString(Col_Rows));
+        int cols = Integer.parseInt(SeatGridItems.getString(Col_Cols));
+
+
+        //SeatStateについて
+        TableName = HelperForSeatGridDB.SeatStateConstants.TableName;
+        Col_ID = HelperForSeatGridDB.SeatStateConstants.ColName_ID;
+        String Col_Row = HelperForSeatGridDB.SeatStateConstants.ColName_Row;
+        String Col_Col = HelperForSeatGridDB.SeatStateConstants.ColName_Col;
+        String Col_isEnabled = HelperForSeatGridDB.SeatStateConstants.ColName_isEnabled;
+        String Col_isScoped = HelperForSeatGridDB.SeatStateConstants.ColName_isScoped;
+        String Col_isEmpty = HelperForSeatGridDB.SeatStateConstants.ColName_isEmpty;
+        String Col_StudentID = HelperForSeatGridDB.SeatStateConstants.ColName_StudentID;
+        //todo バンドルの配列としてしまおう
+        Bundle[][] SeatStateBundles = new Bundle[rows][cols];
+        for(int i=0;i<rows;i++){
+            for(int j=0;j<cols;j++){
+                //席を検索
+                cursor=db.query(TableName,
+                        null,
+                        Col_ID+"=?,"+Col_Row+"=?,"+Col_Col+"=?",
+                        new String[] {String.valueOf(GridID), String.valueOf(i), String.valueOf(j)},
+                        null,null,null);
+                SeatStateBundles[i][j] = new Bundle();
+                try{
+                    if(cursor.moveToNext()==true){
+                        //todo 各項目取得　うえを参考に
+                    }
                 }
             }
         }
 
-        //todo これでいいか？
-        if(view == null){
-            view = getView();
-        }
 
-        // チェックボックス用意
-        checkBoxes = new CheckBox[numRows][numCols]; //1次元に？
-        CheckBox checkBox;
-        for (int i=0;i<numRows;i++) {
-            for (int j=0;j<numCols;j++) {
-                checkBox = new CheckBox(getActivity());
-                //nullで無効、真偽値があればそれに従う
-                if(seatState[i][j]==null){
-                    checkBox.setChecked(false);
-                    checkBox.setEnabled(false);
-                }else{
-                    checkBox.setChecked(seatState[i][j].booleanValue());
-                    checkBox.setEnabled(true);
-                }
-                checkBoxes[i][j]=checkBox;
-            }
-        }
-        checkBox=null;
-        //GridLayoutにチェックボックスを追加
-        GridLayout gridLayout =
-                (GridLayout) view.findViewById(R.id.GridLayout_checkboxesContainer);
-        gridLayout.removeAllViews();
-        gridLayout.setColumnCount(numCols);
-
-        //リソースから
-        final int GridSize = (int)(MyUtil_ForDpAndPx.convertDp2Px(
-                getResources().getInteger(R.integer.GridSize),
-                getActivity()
-        ) + 0.5);
-
-        final int Margin=(int)(MyUtil_ForDpAndPx.convertDp2Px(
-                getResources().getInteger(R.integer.GridMargin),
-                getActivity()
-        ) + 0.5);
-
-
-        //チェックボックスを追加
-        for(int i=0;i<numRows;i++) {
-            for (int j=0;j<numCols;j++) {
-                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.width = GridSize;
-                params.height = GridSize;
-                params.setMargins(Margin,Margin,Margin,Margin);
-                gridLayout.addView(checkBoxes[i][j],params);
-            }
-        }
-
-
-        //行数表示部の設定
-        LockableScrollView VerticalScroll =
-                view.findViewById(R.id.ScrollView_ForRowNum);
-        VerticalScroll.setScrollingEnabled(false);
-        VerticalScroll.setVerticalScrollBarEnabled(false);
-        //LinearLayoutに行数表示
-        int size = GridSize+Margin*2;
-        LinearLayout linearLayout_row = view.findViewById(R.id.LinearLayout_ForRowNums);
-        linearLayout_row.removeAllViews();
-        for(int i=0;i<numRows;i++)
-        {
-            LinearLayout.LayoutParams layoutParams =
-                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,size);
-            layoutParams.gravity = Gravity.RIGHT|Gravity.CENTER_VERTICAL;
-            TextView textView = new TextView(getActivity());
-            textView.setText(String.valueOf(i+1));
-            textView.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
-            linearLayout_row.addView(textView,layoutParams);
-        }
-
-        //列数表示部の設定
-        LockableHorizontalScrollView HorizontalScroll =
-                view.findViewById(R.id.Horizontal_ForColNum);
-        HorizontalScroll.setScrollingEnabled(false);
-        HorizontalScroll.setHorizontalScrollBarEnabled(false);
-        LinearLayout linearLayout_col =
-                view.findViewById(R.id.LinearLayout_ForColNums);
-        linearLayout_col.removeAllViews();
-        for(int i=0;i<numCols;i++){
-            LinearLayout.LayoutParams layoutParams=
-                    new LinearLayout.LayoutParams(size,LinearLayout.LayoutParams.MATCH_PARENT);
-            layoutParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-            TextView textView = new TextView(getActivity());
-            textView.setText(String.valueOf(i+1));
-            textView.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
-            linearLayout_col.addView(textView,layoutParams);
-        }
-
-
-        //スクロール通知を受け取る設定
-        ObservableScrollView observableScrollView=
-                view.findViewById(R.id.ScrollView_ForGrid);
-        observableScrollView.setOnScrollViewListener(this);
-
-        ObservableHorizontalScrollView observableHorizontalScrollView=
-                view.findViewById(R.id.HorizontalScrollView_ForGrid);
-        observableHorizontalScrollView.setOnScrollViewListener(this);
-    }
-
-    //チェックボックスをすべてチェックつけたり外したり(無効なもの以外)
-    public void setIsCheckedAll(boolean isChecked)
-    {
-        for(int i=0;i<numRows;i++){
-            for(int j=0;j<numCols;j++){
-                if(checkBoxes[i][j].isEnabled() == false)continue;
-                checkBoxes[i][j].setChecked(isChecked);
-            }
-        }
-    }
-
-    //1つのチェックを操作
-    public Boolean setIsChecked(int row,int column,boolean isChecked)
-    {
-        if(!(0<=row&&row<numRows && 0<=column&&column<numCols))return false;
-        if(checkBoxes[row][column].isEnabled() == false)return false;
-
-        checkBoxes[row][column].setChecked(isChecked);
-        return true;
-    }
-    
-
-
-    //チェックボックスの状態を返す 無効ならnull
-    public Boolean[][] getIsCheckedAll()
-    {
-        Boolean[][] ret = new Boolean[numRows][numCols];
-        for(int i=0;i<numRows;i++){
-            for(int j=0;j<numCols;j++){
-                if(checkBoxes[i][j].isEnabled()==true)
-                {
-                    ret[i][j] = checkBoxes[i][j].isChecked();
-                }
-                else
-                {
-                    ret[i][j]=null;
-                }
-
-            }
-        }
-        return ret;
     }
 }

@@ -8,8 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.Nullable;
-import android.support.constraint.solver.widgets.Helper;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,7 +19,7 @@ import android.widget.EditText;
 
 public class RowAndColumnActivity extends AppCompatActivity
         implements
-        SeatGridFragment.OnFragmentInteractionListener,
+        CheckBoxGridFragment.OnFragmentInteractionListener,
         InputRowAndColumnFragment.OnFragmentInteractionListener,
         InputUsingScopeSettingFragment.OnFragmentInteractionListener
 {
@@ -29,7 +27,7 @@ public class RowAndColumnActivity extends AppCompatActivity
     private static final String ARG_NUM_ROWS = "param1";
     private static final String ARG_NUM_COLS = "param2";
 
-    private static final String TAG_SEAT_GRID = "SeatGridFragment";
+    private static final String TAG_SEAT_GRID = "CheckBoxGridFragment";
     private static final String TAG_SCOPE ="ScopeFragment";
 
     @Override
@@ -53,13 +51,13 @@ public class RowAndColumnActivity extends AppCompatActivity
         bundle.putInt(ARG_NUM_COLS,columns);
 
         //フラグメントの実体を生成
-        SeatGridFragment seatGridFragment = new SeatGridFragment();
-        seatGridFragment.setArguments(bundle);
+        CheckBoxGridFragment checkBoxGridFragment = new CheckBoxGridFragment();
+        checkBoxGridFragment.setArguments(bundle);
 
         //フラグメント差し込み
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.RelativeLayout_For_Display_Bottom,seatGridFragment,TAG_SEAT_GRID)
+                .replace(R.id.RelativeLayout_For_Display_Bottom, checkBoxGridFragment,TAG_SEAT_GRID)
                 .commit();
     }
 
@@ -72,10 +70,10 @@ public class RowAndColumnActivity extends AppCompatActivity
         Fragment fragmentBottom=
                 getSupportFragmentManager()
                         .findFragmentByTag(TAG_SEAT_GRID);
-        if(!(fragmentBottom instanceof SeatGridFragment))
+        if(!(fragmentBottom instanceof CheckBoxGridFragment))
             return; //何もせず
 
-        SeatGridFragment seatGridFragment = (SeatGridFragment)fragmentBottom;
+        CheckBoxGridFragment checkBoxGridFragment = (CheckBoxGridFragment)fragmentBottom;
 
         //入力部fragment差し替え
         InputUsingScopeSettingFragment inputUsingScopeSettingFragment=
@@ -87,7 +85,7 @@ public class RowAndColumnActivity extends AppCompatActivity
 
         //空席状態を取得
         Boolean[][] seatState =
-                seatGridFragment.getIsCheckedAll();
+                checkBoxGridFragment.getIsCheckedAll();
         //falseのところをnullに
         final int rows = seatState.length;
         final int cols = seatState[0].length;
@@ -101,9 +99,9 @@ public class RowAndColumnActivity extends AppCompatActivity
         }
 
         //空席部分以外のGridを表示
-        seatGridFragment.prepareSeatGrid(rows,cols,seatState,null);
+        checkBoxGridFragment.prepareCheckBoxGrid(rows,cols,seatState,null);
         //チェックを外す
-        seatGridFragment.setIsCheckedAll(false);
+        checkBoxGridFragment.setIsCheckedAll(false);
 
 
     }
@@ -119,15 +117,15 @@ public class RowAndColumnActivity extends AppCompatActivity
         Fragment fragmentBottom=
                 getSupportFragmentManager()
                         .findFragmentByTag(TAG_SEAT_GRID);
-        if(!(fragmentBottom instanceof SeatGridFragment))
+        if(!(fragmentBottom instanceof CheckBoxGridFragment))
             return; //何もせず
 
-        SeatGridFragment seatGridFragment = (SeatGridFragment)fragmentBottom;
+        CheckBoxGridFragment checkBoxGridFragment = (CheckBoxGridFragment)fragmentBottom;
 
         //席状態取得
         //null->空席　true->スコープ内　false->スコープ外
         final Boolean[][] seatStates =
-                seatGridFragment.getIsCheckedAll();
+                checkBoxGridFragment.getIsCheckedAll();
 
         final int rows = seatStates.length;
         final int cols = seatStates[0].length;
@@ -152,7 +150,6 @@ public class RowAndColumnActivity extends AppCompatActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String GridName = editText.getText().toString();
-                        saveSeatState(seatStates,GridName);
                         //席情報を保存
                         long GridID = saveSeatState(seatStates,GridName);
                         if(GridID != -1){
@@ -160,7 +157,7 @@ public class RowAndColumnActivity extends AppCompatActivity
                             Log.i("DB登録","追加成功");
                             Intent data = new Intent();
                             Bundle bundle = new Bundle();
-                            bundle.putString("GridID",String.valueOf(GridID));
+                            bundle.putLong("GridID",GridID);
                             data.putExtras(bundle);
 
                             setResult(Activity.RESULT_OK,data);
@@ -186,8 +183,7 @@ public class RowAndColumnActivity extends AppCompatActivity
         db = mHelperForSeatGrid.getWritableDatabase();
     }
 
-    //todo なんか2回呼ばれる
-    //座席状態で保存。いつかは人名入り
+    //座席状態で保存。いつかは人名入り？
     private long saveSeatState(final Boolean[][] seatStates,final String GridName){
         if(db==null) return -1;
         if(seatStates==null) return -1;

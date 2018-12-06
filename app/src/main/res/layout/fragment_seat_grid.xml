@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SeatGridFragment">
+    tools:context=".CheckBoxGridFragment">
 
 
     <!--todo スクロール可能なグリッドと行列番号表示-->

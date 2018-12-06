@@ -9,7 +9,7 @@ import java.io.FilenameFilter;
 //todo データベースようのヘルパーを作成
 
 public class HelperForSeatGridDB extends SQLiteOpenHelper {
-    private static final int DB_Version = 1;
+    private static final int DB_Version = 3;
     private static final String FileName ="SeatGrid.db";
     //定数
     public class SeatGridConstants{
@@ -55,12 +55,15 @@ public class HelperForSeatGridDB extends SQLiteOpenHelper {
                         ColName_isEnabled + " BOOLEAN,"+
                         ColName_isScoped + " BOOLEAN," +
                         ColName_StudentID + " TEXT," +
-                        "PRIMARY KEY (" + ColName_ID + "," + ColName_Row + "," + ColName_Col + ")"+
+                        "PRIMARY KEY (" + ColName_ID + "," + ColName_Row + "," + ColName_Col + "),"+
+                        "FOREIGN KEY(" + ColName_ID + ")" + " REFERENCES " + SeatGridConstants.TableName +"("+ SeatGridConstants.ColName_ID +")"+
                         ");";
 
         public static final String Query_DropTable = "DROP TABLE "+TableName+";";
     }
 
+    //外部キー有効化
+    private final String Query_EnableForeignKey="PRAGMA foreign_keys=true;";
 
     public HelperForSeatGridDB(Context context){
         super(context,FileName, null, DB_Version);
@@ -71,7 +74,7 @@ public class HelperForSeatGridDB extends SQLiteOpenHelper {
         //todo テーブル全部作る
         db.execSQL(SeatGridConstants.Query_CreateTable);
         db.execSQL(SeatStateConstants.Query_CreateTable);
-
+        db.execSQL(Query_EnableForeignKey);
     }
 
     public void onUpgrade(SQLiteDatabase db,int oldVersion,int newVersion){
