@@ -193,13 +193,13 @@ implements ObservableScrollView.ScrollViewListener,
         checkBox=null;
         //GridLayoutにチェックボックスを追加
         GridLayout gridLayout =
-                (GridLayout) view.findViewById(R.id.GridLayout_checkboxesContainer);
+                (GridLayout) view.findViewById(R.id.GridLayout_Container);
         gridLayout.removeAllViews();
         gridLayout.setColumnCount(numCols);
 
         //リソースから
         final int GridSize = (int)(MyUtil_ForDpAndPx.convertDp2Px(
-                getResources().getInteger(R.integer.GridSize),
+                getResources().getInteger(R.integer.GridSize_ForCheckBox),
                 getActivity()
         ) + 0.5);
 

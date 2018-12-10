@@ -78,8 +78,8 @@ public class HelperForSeatGridDB extends SQLiteOpenHelper {
     }
 
     public void onUpgrade(SQLiteDatabase db,int oldVersion,int newVersion){
-        db.execSQL(SeatGridConstants.Query_DropTable);
         db.execSQL(SeatStateConstants.Query_DropTable);
+        db.execSQL(SeatGridConstants.Query_DropTable);
         onCreate(db);
     }
 }

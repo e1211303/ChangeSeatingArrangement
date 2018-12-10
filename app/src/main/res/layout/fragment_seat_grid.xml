@@ -32,7 +32,7 @@
             app:layout_constraintStart_toStartOf="@+id/ScrollView_ForGrid">
 
             <GridLayout
-                android:id="@+id/GridLayout_checkboxesContainer"
+                android:id="@+id/GridLayout_Container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"></GridLayout>
 

@@ -3,17 +3,17 @@ package com.example.sde2.myapplication;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.constraint.solver.ArrayLinkedVariables;
-import android.support.constraint.solver.widgets.Helper;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
+import android.widget.TextView;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
+import org.w3c.dom.Text;
 
 
 /**
@@ -29,8 +29,15 @@ public class SeatGridFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String ARG_GridID = "param1";
 
+    //instanceState用
+    private static final String InstStateKey_GridID = "param1";
+    private static final String InstStateKey_SeatGridBundle = "param2";
+    private static final String InstStateKey_SeatStateBundles = "param3";
+
     // TODO: Rename and change types of parameters
     private long mGridID = -1;
+    private Bundle mSeatGridBundle = null;
+    private Bundle[][] mSeatStateBundles = null;
 
     private OnFragmentInteractionListener mListener;
 
@@ -59,7 +66,7 @@ public class SeatGridFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            //状態を復元
+            //セットされた引数を取り出す
             mGridID = getArguments().getLong(ARG_GridID);
         }
     }
@@ -115,8 +122,10 @@ public class SeatGridFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+
     private HelperForSeatGridDB mHelper=null;
 
+    //DBからの情報をもとにしてGridをセット
     private boolean prepareSeatGrid(long GridID,View view){
         if(mHelper == null)
             mHelper = new HelperForSeatGridDB(getActivity().getApplicationContext());
@@ -125,77 +134,141 @@ public class SeatGridFragment extends Fragment {
         //todo データベースから情報と取り出す
 
         //SeatGridについて
-        //列名
-        String TableName = HelperForSeatGridDB.SeatGridConstants.TableName;
-        String Col_ID = HelperForSeatGridDB.SeatGridConstants.ColName_ID;
-        String Col_Name = HelperForSeatGridDB.SeatGridConstants.ColName_Name;
-        String Col_Rows = HelperForSeatGridDB.SeatGridConstants.ColName_Rows;
-        String Col_Cols = HelperForSeatGridDB.SeatGridConstants.ColName_Cols;
+        //列名 長かったので新たな変数に
+        final String TableName = HelperForSeatGridDB.SeatGridConstants.TableName;
+        final String Col_ID = HelperForSeatGridDB.SeatGridConstants.ColName_ID;
+        final String Col_Name = HelperForSeatGridDB.SeatGridConstants.ColName_Name;
+        final String Col_Rows = HelperForSeatGridDB.SeatGridConstants.ColName_Rows;
+        final String Col_Cols = HelperForSeatGridDB.SeatGridConstants.ColName_Cols;
 
-        //IDに対応したSeatGrid取得
+        //IDに対応したSeatGrid取得 cursorは先頭-1の位置で帰ってくるらしい
         Cursor cursor = db.query(TableName,
                 null,
                 Col_ID + "=?",
                 new String[]{String.valueOf(GridID)},
                 null,null,null);
 
-        Bundle SeatGridItems = new Bundle();
+        Bundle SeatGridBundle = new Bundle();
         try{
             if(cursor.moveToNext()==true){
                 //表の名前
-                String str = cursor.getString(cursor.getColumnIndex(Col_Name));
-                SeatGridItems.putString(Col_Name,str);
+                String table_name = cursor.getString(cursor.getColumnIndex(Col_Name));
+                SeatGridBundle.putString(Col_Name,table_name);
                 //行数
-                str = cursor.getString(cursor.getColumnIndex(Col_Rows));
-                SeatGridItems.putString(Col_Rows,str);
+                int rows = cursor.getInt(cursor.getColumnIndex(Col_Rows));
+                SeatGridBundle.putInt(Col_Rows,rows);
                 //列数
-                str = cursor.getString(cursor.getColumnIndex(Col_Cols));
-                SeatGridItems.putString(Col_Cols,str);
+                int cols = cursor.getInt(cursor.getColumnIndex(Col_Cols));
+                SeatGridBundle.putInt(Col_Cols,cols);
 
             }
         }catch (Exception e){
-            SeatGridItems = null;
+            SeatGridBundle = null;
         }finally{
             cursor.close();
         }
 
-        if(SeatGridItems == null){
+        if(SeatGridBundle == null){
             //表を取得できなかった
             return false;
         }
 
-        int rows = Integer.parseInt(SeatGridItems.getString(Col_Rows));
-        int cols = Integer.parseInt(SeatGridItems.getString(Col_Cols));
+        final int rows = SeatGridBundle.getInt(Col_Rows);
+        final int cols = SeatGridBundle.getInt(Col_Cols);
 
 
         //SeatStateについて
-        TableName = HelperForSeatGridDB.SeatStateConstants.TableName;
-        Col_ID = HelperForSeatGridDB.SeatStateConstants.ColName_ID;
-        String Col_Row = HelperForSeatGridDB.SeatStateConstants.ColName_Row;
-        String Col_Col = HelperForSeatGridDB.SeatStateConstants.ColName_Col;
-        String Col_isEnabled = HelperForSeatGridDB.SeatStateConstants.ColName_isEnabled;
-        String Col_isScoped = HelperForSeatGridDB.SeatStateConstants.ColName_isScoped;
-        String Col_isEmpty = HelperForSeatGridDB.SeatStateConstants.ColName_isEmpty;
-        String Col_StudentID = HelperForSeatGridDB.SeatStateConstants.ColName_StudentID;
-        //todo バンドルの配列としてしまおう
+        //列名　長かったので（略
+        final String TableName1 = HelperForSeatGridDB.SeatStateConstants.TableName;
+        final String Col_ID1 = HelperForSeatGridDB.SeatStateConstants.ColName_ID;
+        final String Col_Row = HelperForSeatGridDB.SeatStateConstants.ColName_Row;
+        final String Col_Col = HelperForSeatGridDB.SeatStateConstants.ColName_Col;
+        final String Col_isEnabled = HelperForSeatGridDB.SeatStateConstants.ColName_isEnabled;
+        final String Col_isScoped = HelperForSeatGridDB.SeatStateConstants.ColName_isScoped;
+        final String Col_isEmpty = HelperForSeatGridDB.SeatStateConstants.ColName_isEmpty;
+        final String Col_StudentID = HelperForSeatGridDB.SeatStateConstants.ColName_StudentID;
+        //バンドルの配列に格納
         Bundle[][] SeatStateBundles = new Bundle[rows][cols];
         for(int i=0;i<rows;i++){
             for(int j=0;j<cols;j++){
                 //席を検索
-                cursor=db.query(TableName,
+                cursor=db.query(TableName1,
                         null,
-                        Col_ID+"=?,"+Col_Row+"=?,"+Col_Col+"=?",
+                        Col_ID1+"=?,"+Col_Row+"=?,"+Col_Col+"=?",
                         new String[] {String.valueOf(GridID), String.valueOf(i), String.valueOf(j)},
                         null,null,null);
                 SeatStateBundles[i][j] = new Bundle();
                 try{
                     if(cursor.moveToNext()==true){
-                        //todo 各項目取得　うえを参考に
+                        //各項目取得　うえを参考に
+                        //空席設定か
+                        int is_empty_int = cursor.getInt(cursor.getColumnIndex(Col_isEmpty));
+                        //まだ入れるか
+                        int is_enabled_int = cursor.getInt(cursor.getColumnIndex(Col_isEnabled));
+                        //スコープ設定か
+                        int is_scoped_int = cursor.getInt(cursor.getColumnIndex(Col_isScoped));
+                        //学生IDは今のところ省略
+                        //String student_id = cursor.getString(cursor.getColumnIndex(Col_StudentID));
+
+                        //整数値をbooleanに
+                        boolean is_empty = (is_empty_int != 0) ? true : false;
+                        boolean is_enabled = (is_enabled_int !=0) ? true : false;
+                        boolean is_scoped = (is_scoped_int != 0) ? true : false;
+
+                        //Bundleに格納
+                        Bundle tmp = SeatStateBundles[i][j];
+                        tmp.putBoolean(Col_isEmpty,is_empty);
+                        tmp.putBoolean(Col_isEnabled,is_enabled);
+                        tmp.putBoolean(Col_isScoped,is_scoped);
                     }
+                }catch (Exception e){
+                    SeatStateBundles[i][j] = null;
+                    SeatGridBundle = null;
+                }finally {
+                    cursor.close();
                 }
+
+                if(SeatStateBundles[i][j] == null)
+                    return false;
+            }
+        }
+
+        //todo 取り出した情報をもとにGridをセット
+        if(view == null)
+            view = getView();
+
+        //格納先のGridLayout取得
+        GridLayout gridLayout =
+                (GridLayout)view.findViewById(R.id.GridLayout_Container);
+        gridLayout.removeAllViews();
+        gridLayout.setColumnCount(cols);
+
+        //席状態に応じて適切なTextViewをGridに追加
+        TextView[][] textViews = new TextView[rows][cols];
+        TextView textView;
+
+        for(int i=0;i<rows;i++){
+            for(int j=0;j<cols;j++){
+                //席情報に応じたこのtextViewの設定
+                textView = new TextView(getActivity());
+
+                //席情報のバンドル取得
+                final Bundle seatState = SeatStateBundles[i][j];
+
+                //空席設定か？
+                final boolean is_empty = seatState.getBoolean(Col_isEmpty);
+                if(is_empty == true){
+                    textView.setText(getResources().getString(R.string.EmptySeat));
+                    textView.setTextColor(getResources().getColor(R.color.Gray_ForText));
+                    textView.setEnabled(false); //無効化いる？
+                }
+
+                //todo まだ入れるか
+
             }
         }
 
 
+        return false;
     }
 }

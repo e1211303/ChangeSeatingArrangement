@@ -20,6 +20,10 @@
     <string name="Ask_for_GridName">座席表の名前を入力</string>
     <string name="Title_SeatGrid_CouldNotBeAdded">座席表作成に失敗</string>
 
+    <!--Grid内のTextView用-->
+    <string name="EmptySeat">（空席）</string>
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 

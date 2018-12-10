@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="GridSize">30</integer>
+    <integer name="GridSize_ForCheckBox">30</integer>
     <integer name="GridMargin">15</integer>
+
+    <dimen name="GridWidth_ForTextView">80dp</dimen>
+    <dimen name="GridHeight_ForTextView">50dp</dimen>
 </resources>
