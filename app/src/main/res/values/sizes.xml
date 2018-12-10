@@ -3,6 +3,6 @@
     <integer name="GridSize_ForCheckBox">30</integer>
     <integer name="GridMargin">15</integer>
 
-    <dimen name="GridWidth_ForTextView">80dp</dimen>
-    <dimen name="GridHeight_ForTextView">50dp</dimen>
+    <integer name="GridWidth_ForTextView">80</integer>
+    <integer name="GridHeight_ForTextView">50</integer>
 </resources>

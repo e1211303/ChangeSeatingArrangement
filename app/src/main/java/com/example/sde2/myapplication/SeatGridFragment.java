@@ -7,10 +7,12 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -24,7 +26,11 @@ import org.w3c.dom.Text;
  * Use the {@link SeatGridFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SeatGridFragment extends Fragment {
+public class SeatGridFragment extends Fragment
+implements
+        ObservableScrollView.ScrollViewListener,
+        ObservableHorizontalScrollView.ScrollViewListener
+{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String ARG_GridID = "param1";
@@ -243,6 +249,28 @@ public class SeatGridFragment extends Fragment {
         gridLayout.removeAllViews();
         gridLayout.setColumnCount(cols);
 
+        //大きさなどを取得しておく
+        final int GridWidth =
+                (int)(MyUtil_ForDpAndPx.convertDp2Px(
+                    getResources().getInteger(R.integer.GridWidth_ForTextView),
+                    getActivity()
+                )+0.5);
+
+        final int GridHeight =
+                (int)(MyUtil_ForDpAndPx.convertDp2Px(
+                        getResources().getInteger(R.integer.GridHeight_ForTextView),
+                        getActivity()
+                )+0.5);
+
+        final int GridMargin =
+                (int)(MyUtil_ForDpAndPx.convertDp2Px(
+                        getResources().getInteger(R.integer.GridMargin),
+                        getActivity()
+                )+0.5);
+
+
+
+
         //席状態に応じて適切なTextViewをGridに追加
         TextView[][] textViews = new TextView[rows][cols];
         TextView textView;
@@ -255,20 +283,134 @@ public class SeatGridFragment extends Fragment {
                 //席情報のバンドル取得
                 final Bundle seatState = SeatStateBundles[i][j];
 
-                //空席設定か？
+                //席状態取得
                 final boolean is_empty = seatState.getBoolean(Col_isEmpty);
+                final boolean is_enabled = seatState.getBoolean(Col_isEnabled);
+                final boolean is_scoped = seatState.getBoolean(Col_isScoped);
+                final String studentID = seatState.getString(Col_StudentID);
+
+                //状態に応じたtextview設定
+
+                //空席設定か？
                 if(is_empty == true){
+                    //空席の場合 灰色の斜体
                     textView.setText(getResources().getString(R.string.EmptySeat));
+                    textView.setTypeface(null,Typeface.ITALIC);
                     textView.setTextColor(getResources().getColor(R.color.Gray_ForText));
-                    textView.setEnabled(false); //無効化いる？
+                }
+                //以降空席設定でない場合
+                else{
+                    //まだ決まってないかどうか
+                    if(is_enabled == true) {
+                        //まだ入れる場合
+                        textView.setText("");
+                    }else{
+                        //決まっている場合
+                        textView.setText(studentID);    //todo IDから名前を入れる
+                    }
+
+                    //スコープ設定か
+                    if(is_scoped == true){
+                        //スコープ設定の場合 背景を変える
+                        textView.setBackgroundColor(
+                                getResources().getColor(R.color.Background_ForScopedSeat));
+                    }
                 }
 
-                //todo まだ入れるか
-
+                //できたtextviewをセット
+                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                params.width = GridWidth;
+                params.height = GridHeight;
+                params.setMargins(GridMargin,GridMargin,GridMargin,GridMargin);
+                gridLayout.addView(textView,params);
             }
         }
 
+        //todo ここらへんをまとめたviewにしたいな
+
+        //行列表示部の設定
+        //行数表示部の設定
+        LockableScrollView VerticalScroll =
+                view.findViewById(R.id.ScrollView_ForRowNum);
+        VerticalScroll.setScrollingEnabled(false);
+        VerticalScroll.setVerticalScrollBarEnabled(false);
+        //LinearLayoutに行数表示
+        int size = GridHeight+GridMargin*2;
+        LinearLayout linearLayout_row = view.findViewById(R.id.LinearLayout_ForRowNums);
+        linearLayout_row.removeAllViews();
+        for(int i=0;i<rows;i++)
+        {
+            LinearLayout.LayoutParams layoutParams =
+                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,size);
+            layoutParams.gravity = Gravity.RIGHT|Gravity.CENTER_VERTICAL;
+            TextView textView1 = new TextView(getActivity());
+            textView1.setText(String.valueOf(i+1));
+            textView1.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+            linearLayout_row.addView(textView1,layoutParams);
+        }
+
+        //列数表示部の設定
+        LockableHorizontalScrollView HorizontalScroll =
+                view.findViewById(R.id.Horizontal_ForColNum);
+        HorizontalScroll.setScrollingEnabled(false);
+        HorizontalScroll.setHorizontalScrollBarEnabled(false);
+        LinearLayout linearLayout_col =
+                view.findViewById(R.id.LinearLayout_ForColNums);
+        linearLayout_col.removeAllViews();
+        for(int i=0;i<cols;i++){
+            LinearLayout.LayoutParams layoutParams=
+                    new LinearLayout.LayoutParams(size,LinearLayout.LayoutParams.MATCH_PARENT);
+            layoutParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+            TextView textView1 = new TextView(getActivity());
+            textView1.setText(String.valueOf(i+1));
+            textView1.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+            linearLayout_col.addView(textView1,layoutParams);
+        }
+
+        //スクロール通知を受け取る設定
+        ObservableScrollView observableScrollView=
+                view.findViewById(R.id.ScrollView_ForGrid);
+        observableScrollView.setOnScrollViewListener(this);
+
+        ObservableHorizontalScrollView observableHorizontalScrollView=
+                view.findViewById(R.id.HorizontalScrollView_ForGrid);
+        observableHorizontalScrollView.setOnScrollViewListener(this);
 
         return false;
     }
+
+    //縦スクロールされた
+    @Override
+    public void onScrollChanged(ObservableScrollView scrollView, int y, int oldy) {
+        int id = scrollView.getId();
+        switch (id){
+            case R.id.ScrollView_ForGrid:
+                //行数表示のスクロールを動かす
+                LockableScrollView lockableScrollView =
+                        getView().findViewById(R.id.ScrollView_ForRowNum);
+                lockableScrollView.setScrollY(y);
+                break;
+            default:
+                break;
+        }
+    }
+
+    //横スクロールされた
+    @Override
+    public void onScrollChanged(ObservableHorizontalScrollView scrollView, int x, int oldx)
+    {
+        int id = scrollView.getId();
+        switch (id)
+        {
+            case R.id.HorizontalScrollView_ForGrid:
+                //列数表示のスクロールを動かす
+                LockableHorizontalScrollView lockableHorizontalScrollView=
+                        getView().findViewById(R.id.Horizontal_ForColNum);
+                lockableHorizontalScrollView.setScrollX(x);
+                break;
+            default:
+                break;
+        }
+    }
+
 }
