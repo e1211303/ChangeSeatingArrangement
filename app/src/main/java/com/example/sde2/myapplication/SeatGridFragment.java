@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -84,17 +85,14 @@ implements
         View view = inflater.inflate(R.layout.fragment_seat_grid, container, false);
 
         //todo DBの情報をもとにGrid用意
-
+        if(prepareSeatGrid(mGridID,view)==false){
+            mListener.CoundNotFetchFromDatabase(this);
+        }
 
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+
 
     @Override
     public void onAttach(Context context) {
@@ -124,8 +122,8 @@ implements
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        //データベースからの取得に失敗
+        void CoundNotFetchFromDatabase(SeatGridFragment fragment);
     }
 
 
@@ -137,7 +135,7 @@ implements
             mHelper = new HelperForSeatGridDB(getActivity().getApplicationContext());
         SQLiteDatabase db = mHelper.getReadableDatabase();
 
-        //todo データベースから情報と取り出す
+        //データベースから情報と取り出す
 
         //SeatGridについて
         //列名 長かったので新たな変数に
@@ -200,7 +198,7 @@ implements
                 //席を検索
                 cursor=db.query(TableName1,
                         null,
-                        Col_ID1+"=?,"+Col_Row+"=?,"+Col_Col+"=?",
+                        Col_ID1 + "=? AND " + Col_Row + "=? AND " + Col_Col+"=?",
                         new String[] {String.valueOf(GridID), String.valueOf(i), String.valueOf(j)},
                         null,null,null);
                 SeatStateBundles[i][j] = new Bundle();
@@ -239,7 +237,7 @@ implements
             }
         }
 
-        //todo 取り出した情報をもとにGridをセット
+        //取り出した情報をもとにGridをセット
         if(view == null)
             view = getView();
 
@@ -268,17 +266,13 @@ implements
                         getActivity()
                 )+0.5);
 
-
-
-
         //席状態に応じて適切なTextViewをGridに追加
         TextView[][] textViews = new TextView[rows][cols];
         TextView textView;
 
         for(int i=0;i<rows;i++){
             for(int j=0;j<cols;j++){
-                //席情報に応じたこのtextViewの設定
-                textView = new TextView(getActivity());
+
 
                 //席情報のバンドル取得
                 final Bundle seatState = SeatStateBundles[i][j];
@@ -289,7 +283,12 @@ implements
                 final boolean is_scoped = seatState.getBoolean(Col_isScoped);
                 final String studentID = seatState.getString(Col_StudentID);
 
-                //状態に応じたtextview設定
+                //席情報に応じたこのtextViewの設定
+                textView = new TextView(getActivity());
+                //共通設定はここに
+                textView.setGravity(Gravity.CENTER);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,22);
+                textView.setBackgroundResource(R.drawable.my_border_for_textview);
 
                 //空席設定か？
                 if(is_empty == true){
@@ -297,6 +296,8 @@ implements
                     textView.setText(getResources().getString(R.string.EmptySeat));
                     textView.setTypeface(null,Typeface.ITALIC);
                     textView.setTextColor(getResources().getColor(R.color.Gray_ForText));
+                    textView.setBackgroundColor(
+                            getResources().getColor(R.color.BackGround_ForEmptySeat));
                 }
                 //以降空席設定でない場合
                 else{
@@ -350,6 +351,7 @@ implements
         }
 
         //列数表示部の設定
+        size = GridWidth+GridMargin*2;
         LockableHorizontalScrollView HorizontalScroll =
                 view.findViewById(R.id.Horizontal_ForColNum);
         HorizontalScroll.setScrollingEnabled(false);
@@ -376,7 +378,7 @@ implements
                 view.findViewById(R.id.HorizontalScrollView_ForGrid);
         observableHorizontalScrollView.setOnScrollViewListener(this);
 
-        return false;
+        return true;
     }
 
     //縦スクロールされた

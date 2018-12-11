@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
 
-    <color name="Gray_ForText">#aaaaaa</color>
-    <color name="Background_ForScopedSeat">#FFA1D1</color>
+    <color name="Gray_ForText">#cccccc</color>
+    <color name="BackGround_ForEmptySeat">#888888</color>
+    <color name="Background_ForScopedSeat">#FFCFE0</color>
 </resources>
