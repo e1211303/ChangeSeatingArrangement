@@ -2,9 +2,12 @@ package com.example.sde2.myapplication;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 public class LotteryActivity extends AppCompatActivity
-    implements SeatGridFragment.OnFragmentInteractionListener
+    implements SeatGridFragment.OnFragmentInteractionListener,
+        View.OnClickListener
 {
 
     private long mGridID = -1;
@@ -32,7 +35,12 @@ public class LotteryActivity extends AppCompatActivity
                 .replace(R.id.FrameLayout_SeatGridContainer,seatGridFragment,TAG_SEAT_GRID)
                 .commit();
 
-        //todo 下部のメニュー
+        //下部のボタンにリスナー（this）をセット
+        Button button = (Button)findViewById(R.id.Button_ManualSetting);
+        button.setOnClickListener(this);
+
+        button = (Button)findViewById(R.id.Button_StartLottery);
+        button.setOnClickListener(this);
     }
 
     @Override
@@ -58,4 +66,20 @@ public class LotteryActivity extends AppCompatActivity
         throw new RuntimeException(getApplicationContext().toString()
             + "Fetching SeatState Error.");
     }
+
+    @Override
+    public void onClick(View view){
+        final int id = view.getId();
+        switch (id)
+        {
+            case R.id.Button_ManualSetting:
+                //todo 手動設定開始
+                break;
+
+            case R.id.Button_StartLottery:
+                //todo くじ引き開始
+                break;
+        }
+    }
+
 }
