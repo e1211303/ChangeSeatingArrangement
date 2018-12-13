@@ -62,6 +62,8 @@ public class HelperForSeatGridDB extends SQLiteOpenHelper {
         public static final String Query_DropTable = "DROP TABLE "+TableName+";";
     }
 
+    //todo 学生のidと名前のデータベースも
+
     //外部キー有効化
     private final String Query_EnableForeignKey="PRAGMA foreign_keys=true;";
 

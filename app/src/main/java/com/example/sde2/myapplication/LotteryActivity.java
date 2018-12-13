@@ -1,12 +1,14 @@
 package com.example.sde2.myapplication;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
 public class LotteryActivity extends AppCompatActivity
-    implements SeatGridFragment.OnFragmentInteractionListener,
+    implements
+        SeatGridFragment.OnFragmentInteractionListener,
         View.OnClickListener
 {
 
@@ -14,6 +16,8 @@ public class LotteryActivity extends AppCompatActivity
     private final String KEY_GRID_ID = "GridID";
 
     private final String TAG_SEAT_GRID = "SeatGridFragment";
+
+    private final int REQUEST_CODE_MANUAL_SETTING = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,13 +30,12 @@ public class LotteryActivity extends AppCompatActivity
         Bundle bundle = new Bundle();
         bundle.putLong(SeatGridFragment.ARG_GridID,mGridID);
 
-        //フラグメント実体を生成
-        SeatGridFragment seatGridFragment = new SeatGridFragment();
-        seatGridFragment.setArguments(bundle);
         //フラグメントセット
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.FrameLayout_SeatGridContainer,seatGridFragment,TAG_SEAT_GRID)
+                .replace(R.id.FrameLayout_SeatGridContainer,
+                        SeatGridFragment.newInstance(mGridID),
+                        TAG_SEAT_GRID)
                 .commit();
 
         //下部のボタンにリスナー（this）をセット
@@ -62,7 +65,7 @@ public class LotteryActivity extends AppCompatActivity
 
 
     @Override
-    public void CoundNotFetchFromDatabase(SeatGridFragment fragment){
+    public void CouldNotFetchFromDatabase(SeatGridFragment fragment){
         throw new RuntimeException(getApplicationContext().toString()
             + "Fetching SeatState Error.");
     }
@@ -74,10 +77,28 @@ public class LotteryActivity extends AppCompatActivity
         {
             case R.id.Button_ManualSetting:
                 //todo 手動設定開始
+                Intent intent = new Intent(getApplication(),ManualSettingActivity.class);
+                intent.putExtra(ManualSettingActivity.ARG_GRID_ID,mGridID);
+                startActivityForResult(intent,REQUEST_CODE_MANUAL_SETTING);
                 break;
 
             case R.id.Button_StartLottery:
                 //todo くじ引き開始
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode,int resultCode,Intent data){
+        switch(requestCode){
+            case REQUEST_CODE_MANUAL_SETTING:
+                if(resultCode != RESULT_OK)
+                    return;
+
+                //SeatGrid更新
+                SeatGridFragment fragment =  (SeatGridFragment)getSupportFragmentManager()
+                        .findFragmentByTag(TAG_SEAT_GRID);
+                fragment.prepareSeatGrid(mGridID,null);
                 break;
         }
     }

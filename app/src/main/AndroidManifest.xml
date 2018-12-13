@@ -18,13 +18,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".RowAndColumnActivity"
             android:screenOrientation="sensorLandscape" />
-
-        <activity android:name=".LotteryActivity"
-            android:screenOrientation="sensorLandscape"></activity>
+        <activity
+            android:name=".LotteryActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity android:name=".ManualSettingActivity"></activity>
     </application>
 
 </manifest>

@@ -11,55 +11,23 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link SeatGridFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link SeatGridFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class SeatGridFragment extends Fragment
+//Gridに入れるものを変えただけ。　todo クラス一覧から選ぶとかそんな感じにいつかしたい
+public class TextBoxGridFragment extends SeatGridFragment
 implements
-        ObservableScrollView.ScrollViewListener,
-        ObservableHorizontalScrollView.ScrollViewListener
+        AdapterView.OnItemSelectedListener
 {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    public static final String ARG_GridID = "param1";
 
-    //instanceState用
-    protected static final String InstStateKey_GridID = "param1";
-    protected static final String InstStateKey_SeatGridBundle = "param2";
-    protected static final String InstStateKey_SeatStateBundles = "param3";
-
-    // TODO: Rename and change types of parameters
-    protected long mGridID = -1;
-    protected Bundle mSeatGridBundle = null;
-    protected Bundle[][] mSeatStateBundles = null;
-
-    protected OnFragmentInteractionListener mListener;
-
-    public SeatGridFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     *
-     * @param GridID
-     * @return A new instance of fragment SeatGridFragment.
-     */
-    // フラグメントの生成と引数設定を請け負う
-    public static SeatGridFragment newInstance(long GridID) {
-        SeatGridFragment fragment = new SeatGridFragment();
+    public static TextBoxGridFragment newInstance(long GridID){
+        TextBoxGridFragment fragment = new TextBoxGridFragment();
         Bundle args = new Bundle();
         args.putLong(ARG_GridID,GridID);
         fragment.setArguments(args);
@@ -67,67 +35,7 @@ implements
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            //セットされた引数を取り出す
-            mGridID = getArguments().getLong(ARG_GridID);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_seat_grid, container, false);
-
-        //DBの情報をもとにGrid用意
-        if(prepareSeatGrid(mGridID,view)==false){
-            mListener.CouldNotFetchFromDatabase(this);
-        }
-
-        return view;
-    }
-
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        //データベースからの取得に失敗
-        void CouldNotFetchFromDatabase(SeatGridFragment fragment);
-    }
-
-
-    protected HelperForSeatGridDB mHelper=null;
-
-    //DBからの情報をもとにしてGridをセット
-    public boolean prepareSeatGrid(long GridID,View view){
+    public boolean prepareSeatGrid(long GridID, View view) {
         if(view == null)
             view = getView();
 
@@ -250,8 +158,8 @@ implements
         //大きさなどを取得しておく
         final int GridWidth =
                 (int)(MyUtil_ForDpAndPx.convertDp2Px(
-                    getResources().getInteger(R.integer.GridWidth_ForTextView),
-                    getActivity()
+                        getResources().getInteger(R.integer.GridWidth_ForTextView),
+                        getActivity()
                 )+0.5);
 
         final int GridHeight =
@@ -265,6 +173,22 @@ implements
                         getResources().getInteger(R.integer.GridMargin),
                         getActivity()
                 )+0.5);
+
+        //---------------
+        //空席設定でない席数
+        int notEmptyCount =0;
+        for(int i=0;i<rows;++i){
+            for(int j=0;j<cols;++j){
+                boolean isEmpty = SeatStateBundles[i][j].getBoolean(Col_isEmpty);
+                if(!isEmpty)
+                    ++notEmptyCount;
+            }
+        }
+        final int numOfStudent = notEmptyCount; //確定した隻数
+
+
+
+        //---------------
 
         //席状態に応じて適切なTextViewをGridに追加
         TextView[][] textViews = new TextView[rows][cols];
@@ -381,38 +305,99 @@ implements
         return true;
     }
 
-    //縦スクロールされた
-    @Override
-    public void onScrollChanged(ObservableScrollView scrollView, int y, int oldy) {
-        int id = scrollView.getId();
-        switch (id){
-            case R.id.ScrollView_ForGrid:
-                //行数表示のスクロールを動かす
-                LockableScrollView lockableScrollView =
-                        getView().findViewById(R.id.ScrollView_ForRowNum);
-                lockableScrollView.setScrollY(y);
-                break;
-            default:
-                break;
+    //席数からスピナーをセット
+    private void setSpinner(Spinner spinner, int numOfNonEmpties){
+        String[] stringArray = new String[numOfNonEmpties];
+        for(int i=0;i<numOfNonEmpties;++i){
+            stringArray[i] = String.valueOf(i);
         }
+
+        ArrayAdapter adapter =
+                new ArrayAdapter(getContext(),android.R.layout.simple_spinner_item,stringArray);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
     }
 
-    //横スクロールされた
+    //スピナーで選択されたとき
     @Override
-    public void onScrollChanged(ObservableHorizontalScrollView scrollView, int x, int oldx)
-    {
-        int id = scrollView.getId();
-        switch (id)
-        {
-            case R.id.HorizontalScrollView_ForGrid:
-                //列数表示のスクロールを動かす
-                LockableHorizontalScrollView lockableHorizontalScrollView=
-                        getView().findViewById(R.id.Horizontal_ForColNum);
-                lockableHorizontalScrollView.setScrollX(x);
-                break;
-            default:
-                break;
-        }
+    public void onItemSelected(AdapterView parent, View view, int position, long id) {
+
     }
 
+    //スピナーの重複を調べる関数。色も付ける
+    private boolean checkSpinners(){
+        ArrayList<Spinner> spinners = getSpinners();
+
+        final int num = spinners.size();
+
+
+
+
+        //すべてのスピナーについて、選択された数字を取得
+        final String KEY_INDEX = "param1";
+        final String KEY_SELECTED_NUM = "param2";
+        ArrayList<Bundle> selectedItemAndIndexBundle = new ArrayList<Bundle>();
+
+        for(int indexInSpinners=0;indexInSpinners<num;++indexInSpinners){
+            int selectedNum = Integer.parseInt(spinners.get(indexInSpinners).getSelectedItem().toString());
+
+            //選択したスピナー位置と内容をまとめておく
+            Bundle bundle = new Bundle();
+            bundle.putInt(KEY_INDEX,indexInSpinners);
+            bundle.putInt(KEY_SELECTED_NUM,selectedNum);
+
+            //配列に格納
+            selectedItemAndIndexBundle.add(bundle);
+        }
+
+        //取得された数字について重複を調べ、見つけた
+        while(true){
+            //先頭のBundleを取得
+            Bundle nowBundle = selectedItemAndIndexBundle.get(0); //注目点の情報
+
+            boolean notFound = false;   //見つからなくなるまで、検索と削除を繰り返す
+            while(notFound == false){
+                //末尾から先頭要素と比較
+                for(int at = selectedItemAndIndexBundle.size()-1; 1 <= at; --at){
+                    Bundle watchBundle = selectedItemAndIndexBundle.get(at);
+                    int nowSelected = nowBundle.getInt(KEY_SELECTED_NUM);
+                    int watchSelected = watchBundle.getInt(KEY_SELECTED_NUM);
+                    //重複を判定
+                    if(nowSelected == watchSelected){
+                        //色を変える。検索対象から削除。
+                        final int spinnerIndex = watchBundle.getInt(KEY_INDEX); //格納先
+                        Spinner watchSpinner = spinners.get(spinnerIndex);  //見つけたスピナー
+                        //todo 重複したスピナーを強調したい
+
+                }
+            }
+
+            //見つからなかったらat == 0のはず.
+        }
+
+
+
+
+
+        }
+
+        return true;
+    }
+
+    private ArrayList<Spinner> getSpinners(){
+        View view = getView();
+        GridLayout gridLayout = (GridLayout)view.findViewById(R.id.GridLayout_Container);
+
+        //すべてのスピナーを取得
+        final int numOfViews = gridLayout.getChildCount();
+        ArrayList<Spinner> spinners = new ArrayList<Spinner>();
+
+        for(int i=0;i<numOfViews;++i){
+            View gotView = gridLayout.getChildAt(i);
+            if(gotView instanceof Spinner){
+                spinners.add((Spinner)gotView);
+            }
+        }
+        return spinners;
+    }
 }
