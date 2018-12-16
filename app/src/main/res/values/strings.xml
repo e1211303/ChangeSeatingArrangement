@@ -30,6 +30,8 @@
 
     <!--ManualSetting-->
     <string name="Cancel">キャンセル</string>
+    <string name="AlertDialogTitle_HasDuplication">重複する項目があります</string>
+    <string name="AlertDialogMessage_HasDuplication">重複を解消してください</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

@@ -5,4 +5,7 @@
 
     <integer name="GridWidth_ForTextView">80</integer>
     <integer name="GridHeight_ForTextView">50</integer>
+
+    <integer name="GridWidth_ForSpinner">120</integer>
+    <integer name="GridHeight_ForSpinner">@integer/GridHeight_ForTextView</integer>
 </resources>

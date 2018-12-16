@@ -1,5 +1,7 @@
 package com.example.sde2.myapplication;
 
+import android.app.ActionBar;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -34,6 +36,20 @@ implements
         return fragment;
     }
 
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//        // Inflate the layout for this fragment
+//        View view = inflater.inflate(R.layout.fragment_seat_grid, container, false);
+//
+//        //DBの情報をもとにGrid用意
+//        if(prepareSeatGrid(mGridID,view)==false){
+//            mListener.CouldNotFetchFromDatabase(this);
+//        }
+//
+//        return view;
+//    }
+
+    //データベースからの席設定を基にスピンボックス生成
     @Override
     public boolean prepareSeatGrid(long GridID, View view) {
         if(view == null)
@@ -120,7 +136,7 @@ implements
                         //スコープ設定か
                         int is_scoped_int = cursor.getInt(cursor.getColumnIndex(Col_isScoped));
                         //学生IDは今のところ省略
-                        //String student_id = cursor.getString(cursor.getColumnIndex(Col_StudentID));
+                        String student_id = cursor.getString(cursor.getColumnIndex(Col_StudentID));
 
                         //整数値をbooleanに
                         boolean is_empty = (is_empty_int != 0) ? true : false;
@@ -132,6 +148,7 @@ implements
                         tmp.putBoolean(Col_isEmpty,is_empty);
                         tmp.putBoolean(Col_isEnabled,is_enabled);
                         tmp.putBoolean(Col_isScoped,is_scoped);
+                        tmp.putString(Col_StudentID,student_id);
                     }
                 }catch (Exception e){
                     SeatStateBundles[i][j] = null;
@@ -158,13 +175,13 @@ implements
         //大きさなどを取得しておく
         final int GridWidth =
                 (int)(MyUtil_ForDpAndPx.convertDp2Px(
-                        getResources().getInteger(R.integer.GridWidth_ForTextView),
+                        getResources().getInteger(R.integer.GridWidth_ForSpinner),
                         getActivity()
                 )+0.5);
 
         final int GridHeight =
                 (int)(MyUtil_ForDpAndPx.convertDp2Px(
-                        getResources().getInteger(R.integer.GridHeight_ForTextView),
+                        getResources().getInteger(R.integer.GridHeight_ForSpinner),
                         getActivity()
                 )+0.5);
 
@@ -199,7 +216,7 @@ implements
                 final boolean is_scoped = seatState.getBoolean(Col_isScoped);
                 final String studentID = seatState.getString(Col_StudentID);
 
-                //空席設定か 同様の空席テキストビュー
+                //空席設定か 空席用テキストビュー
                 if(is_empty){
                     TextView textView = new TextView(getActivity());
                     textView.setGravity(Gravity.CENTER);
@@ -220,7 +237,7 @@ implements
                 }
                 else
                 {
-                    //適切なスピナーを入れる
+                    //スピナーを入れる
                     Spinner spinner = new Spinner(getActivity());
                     setSpinner(spinner,numOfStudent);   //項目をセット
 
@@ -235,12 +252,19 @@ implements
                         spinner.setSelection(id);
                     }
 
+                    //Gridにセット
+                    GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                    params.width = GridWidth;
+                    params.height = GridHeight;
+                    params.setMargins(GridMargin,GridMargin,GridMargin,GridMargin);
+                    gridLayout.addView(spinner,params);
+
                     //スコープ設定か
-                    if(is_scoped == true){
-                        //スコープ設定の場合 背景を変える
-                        spinner.setBackgroundColor(
-                                getResources().getColor(R.color.Background_ForScopedSeat));
-                    }
+//                    if(is_scoped == true){
+//                        //スコープ設定の場合 背景を変える
+//                        spinner.setBackgroundColor(
+//                                getResources().getColor(R.color.Background_ForScopedSeat));
+//                    }
                 }
             }
         }
@@ -248,62 +272,6 @@ implements
 
         //---------------
 
-        //席状態に応じて適切なTextViewをGridに追加
-
-        for(int i=0;i<rows;i++){
-            for(int j=0;j<cols;j++){
-                //席情報のバンドル取得
-                final Bundle seatState = SeatStateBundles[i][j];
-
-                //席状態取得
-                final boolean is_empty = seatState.getBoolean(Col_isEmpty);
-                final boolean is_enabled = seatState.getBoolean(Col_isEnabled);
-                final boolean is_scoped = seatState.getBoolean(Col_isScoped);
-                final String studentID = seatState.getString(Col_StudentID);
-
-                //席情報に応じたこのtextViewの設定
-                TextView textView = new TextView(getActivity());
-                //共通設定
-                textView.setGravity(Gravity.CENTER);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,22);
-                textView.setBackgroundResource(R.drawable.my_border_for_textview);
-
-                //空席設定か？
-                if(is_empty == true){
-                    //空席の場合 灰色の斜体
-                    textView.setText(getResources().getString(R.string.EmptySeat));
-                    textView.setTypeface(null,Typeface.ITALIC);
-                    textView.setTextColor(getResources().getColor(R.color.Gray_ForText));
-                    textView.setBackgroundColor(
-                            getResources().getColor(R.color.BackGround_ForEmptySeat));
-                }
-                //以降空席設定でない場合
-                else{
-                    //まだ決まってないかどうか
-                    if(is_enabled == true) {
-                        //まだ入れる場合
-                        textView.setText("");
-                    }else{
-                        //決まっている場合
-                        textView.setText(studentID);    //todo IDから名前を入れる
-                    }
-
-                    //スコープ設定か
-                    if(is_scoped == true){
-                        //スコープ設定の場合 背景を変える
-                        textView.setBackgroundColor(
-                                getResources().getColor(R.color.Background_ForScopedSeat));
-                    }
-                }
-
-                //できたtextviewをセット
-                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.width = GridWidth;
-                params.height = GridHeight;
-                params.setMargins(GridMargin,GridMargin,GridMargin,GridMargin);
-                gridLayout.addView(textView,params);
-            }
-        }
 
         //todo ここらへんをまとめたviewにしたいな
 
@@ -362,7 +330,9 @@ implements
     //有効席数からスピナーをセット　0からnum
     private void setSpinner(Spinner spinner, int numOfNonEmpties){
         String[] stringArray = new String[numOfNonEmpties + 1];
-        for(int i=0; i<=numOfNonEmpties; ++i){
+
+        stringArray[0] = "(未選択)";
+        for(int i=1; i<=numOfNonEmpties; ++i){
             stringArray[i] = String.valueOf(i);
         }
 
@@ -370,6 +340,7 @@ implements
                 new ArrayAdapter(getContext(),android.R.layout.simple_spinner_item,stringArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
     }
 
     //スピナーで選択されたとき
@@ -378,13 +349,16 @@ implements
         checkSpinners();
     }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        return;
+    }
+
     //スピナーの重複を調べる関数。色も付ける
-    private boolean checkSpinners(){
+    public boolean checkSpinners(){
         ArrayList<Spinner> spinners = getSpinners();
 
         final int num = spinners.size();
-
-
 
 
         //すべてのスピナーについて、選択された数字を取得
@@ -393,8 +367,9 @@ implements
         ArrayList<Bundle> selectedItemAndIndexBundle = new ArrayList<Bundle>();
 
         for(int indexInSpinners=0;indexInSpinners<num;++indexInSpinners){
-            int selectedNum = Integer.parseInt(spinners.get(indexInSpinners).getSelectedItem().toString());
-            if(selectedNum != 0){   //未選択は除く
+            Spinner spinner = spinners.get(indexInSpinners);
+            final int selectedNum = spinner.getSelectedItemPosition();
+            if(selectedNum != 0){   //未選択について記憶
                 //スピナー添字と内容をまとめておく
                 Bundle bundle = new Bundle();
                 bundle.putInt(KEY_INDEX,indexInSpinners);
@@ -402,11 +377,13 @@ implements
 
                 //配列に格納
                 selectedItemAndIndexBundle.add(bundle);
+            }else{
+                //未選択のものは無条件に普通の表示
+                spinner.setBackgroundColor(
+                        getResources().getColor(R.color.Background_ForNonDuplicatedSpinner));
             }
 
         }
-
-        //todo 正常なら色を戻したい
 
         //取得された数字について重複を調べる
         boolean hasDuplication = false; //全体を通して重複があったか
@@ -415,17 +392,20 @@ implements
             Bundle nowBundle = selectedItemAndIndexBundle.get(0); //注目点(先頭)の情報
 
             boolean flag_removed = false;   //今の先頭と比較して重複があったか
-            //末尾から、先頭要素と比較
+            //末尾から順番に、先頭要素と比較
             for(int at = selectedItemAndIndexBundle.size() - 1; 1 <= at; --at){
                 Bundle watchBundle = selectedItemAndIndexBundle.get(at);
                 int nowSelected = nowBundle.getInt(KEY_SELECTED_NUM);
                 int watchSelected = watchBundle.getInt(KEY_SELECTED_NUM);
+
+                //判定に応じてこれの色を変えたりする
+                final int spinnerIndex = watchBundle.getInt(KEY_INDEX); //格納先
+                Spinner watchSpinner = spinners.get(spinnerIndex);  //注目のスピナー
+
                 //重複を判定
                 if(nowSelected == watchSelected){
+                    //重複していた
                     hasDuplication = true;
-                    //色を変える。
-                    final int spinnerIndex = watchBundle.getInt(KEY_INDEX); //格納先
-                    Spinner watchSpinner = spinners.get(spinnerIndex);  //見つけたスピナー
                     //重複したスピナーを強調
                     watchSpinner.setBackgroundColor(
                             getResources().getColor(R.color.Background_ForDuplicatedSpinner));
@@ -433,19 +413,99 @@ implements
                     selectedItemAndIndexBundle.remove(at);
                     flag_removed = true;
                 }
-            }
-            //重複があったらそれも色を変える
-            if(flag_removed==true){
-                int index = nowBundle.getInt(KEY_INDEX);
-                spinners.get(index).setBackgroundColor(
-                    getResources().getColor(R.color.Background_ForDuplicatedSpinner));
+                else{
+                    //重複していない　色を通常に　削除はしない
+                    watchSpinner.setBackgroundColor(
+                            getResources().getColor(R.color.Background_ForNonDuplicatedSpinner));
+                }
             }
 
-            //基準だった先頭要素を削除する
+            //基準のスピナーを取得
+            final int index = nowBundle.getInt(KEY_INDEX);
+            Spinner spinner = spinners.get(index);
+
+            //基準のスピナーの後処理
+            if(flag_removed==true){
+                //１つでも重複があったとき同様に重複の色に
+                spinner.setBackgroundColor(
+                    getResources().getColor(R.color.Background_ForDuplicatedSpinner));
+            }else{
+                //重複がなければ色を戻す
+                spinner.setBackgroundColor(
+                        getResources().getColor(R.color.Background_ForNonDuplicatedSpinner));
+            }
+
+            //基準だった先頭要素を検索対象から削除する
             selectedItemAndIndexBundle.remove(0);
         }
 
         return (!hasDuplication);
+    }
+
+    //現在の状態でDB更新
+    public boolean updateDB()
+    {
+        if(mHelper == null)
+            mHelper = new HelperForSeatGridDB(getActivity().getApplicationContext());
+        SQLiteDatabase db = mHelper.getReadableDatabase();
+
+        //行列数
+        View view = getView();
+        GridLayout gridLayout = view.findViewById(R.id.GridLayout_Container);
+        if(gridLayout == null)
+            return false;
+
+        //長方形の前提
+        final int rows = gridLayout.getRowCount();
+        final int cols = gridLayout.getColumnCount();
+
+        //各席の状態を更新
+        for(int i=0;i<rows;++i){
+            for(int j=0;j<cols;++j){
+                //その位置のview取得
+                View gotView = gridLayout.getChildAt(i*cols + j);
+
+                //多分空席
+                if((gotView instanceof Spinner)==false)
+                    continue;
+
+                //スピナーから選択状態を確認
+                Spinner spinner = (Spinner) gotView;
+                final int selected = spinner.getSelectedItemPosition();
+
+                //データベース用
+                final String TableName1 = HelperForSeatGridDB.SeatStateConstants.TableName;
+                final String Col_ID1 = HelperForSeatGridDB.SeatStateConstants.ColName_ID;
+                final String Col_Row = HelperForSeatGridDB.SeatStateConstants.ColName_Row;
+                final String Col_Col = HelperForSeatGridDB.SeatStateConstants.ColName_Col;
+                final String Col_isEnabled = HelperForSeatGridDB.SeatStateConstants.ColName_isEnabled;
+                final String Col_StudentID = HelperForSeatGridDB.SeatStateConstants.ColName_StudentID;
+
+                ContentValues cv = new ContentValues();
+                final String Where =
+                        Col_ID1 + " = ? AND " +
+                        Col_Row + " = ? AND " +
+                        Col_Col + " = ?";
+                final String[] WhereArgs =
+                        new String[] {String.valueOf(mGridID),String.valueOf(i),String.valueOf(j)};
+                //未選択と選択済みに応じた更新内容
+                if(selected == 0){
+                    //未選択設定 enabled studentid=0
+                    //設定値
+                    cv.put(Col_isEnabled,true);
+                    cv.put(Col_StudentID,(String)null);
+                }else{
+                    //選択済み
+                    cv.put(Col_isEnabled,false);
+                    cv.put(Col_StudentID,String.valueOf(selected));
+                }
+
+                //update実行
+                db.update(TableName1,cv,Where,WhereArgs);
+            }
+        }
+
+        return true;
     }
 
     private ArrayList<Spinner> getSpinners(){

@@ -212,7 +212,7 @@ implements
                         //スコープ設定か
                         int is_scoped_int = cursor.getInt(cursor.getColumnIndex(Col_isScoped));
                         //学生IDは今のところ省略
-                        //String student_id = cursor.getString(cursor.getColumnIndex(Col_StudentID));
+                        String student_id = cursor.getString(cursor.getColumnIndex(Col_StudentID));
 
                         //整数値をbooleanに
                         boolean is_empty = (is_empty_int != 0) ? true : false;
@@ -224,6 +224,7 @@ implements
                         tmp.putBoolean(Col_isEmpty,is_empty);
                         tmp.putBoolean(Col_isEnabled,is_enabled);
                         tmp.putBoolean(Col_isScoped,is_scoped);
+                        tmp.putString(Col_StudentID,student_id);
                     }
                 }catch (Exception e){
                     SeatStateBundles[i][j] = null;
@@ -267,7 +268,6 @@ implements
                 )+0.5);
 
         //席状態に応じて適切なTextViewをGridに追加
-        TextView[][] textViews = new TextView[rows][cols];
         TextView textView;
 
         for(int i=0;i<rows;i++){
@@ -380,6 +380,7 @@ implements
 
         return true;
     }
+
 
     //縦スクロールされた
     @Override

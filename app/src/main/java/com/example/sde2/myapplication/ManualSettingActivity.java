@@ -1,6 +1,8 @@
 package com.example.sde2.myapplication;
 
+import android.app.Dialog;
 import android.os.PersistableBundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -33,7 +35,7 @@ implements
         bundle.putLong(SeatGridFragment.ARG_GridID,mGridID);
 
         //フラグメント生成
-        SeatGridFragment fragment = new SeatGridFragment();
+        TextBoxGridFragment fragment = new TextBoxGridFragment();
         fragment.setArguments(bundle);
         //フレームレイアウトにセット
         getSupportFragmentManager()
@@ -63,9 +65,41 @@ implements
 
     @Override
     public void onClick(View v) {
+        if(v instanceof Button)
+            MyUtil_ForButton.disableButtonForMillisecs((Button)v,1000);
+
+
         final int id = v.getId();
         switch (id){
+            //決定ボタン　重複確かめてだめならエラー
             case R.id.Button_OK:
+
+                //フラグメント取得
+                TextBoxGridFragment fragment =
+                        (TextBoxGridFragment)
+                                getSupportFragmentManager()
+                                .findFragmentByTag(TAG_SEATGRID);
+                if(fragment == null)
+                    break;
+
+                //重複チェック
+                final boolean NoDuplication = fragment.checkSpinners();
+                if(NoDuplication == false){
+                    //重複があればエラー表示して何もしない
+                    new AlertDialog.Builder(this)
+                            .setTitle(getResources()
+                                    .getString(R.string.AlertDialogTitle_HasDuplication))
+                            .setMessage(getResources()
+                                    .getString(R.string.AlertDialogMessage_HasDuplication))
+                            .setCancelable(true)
+                            .show();
+                    break;
+                }
+
+                //その内容でDB更新　取り出すんめんどいんでfragmentで実装
+                if(fragment.updateDB() == false)
+                    break;
+
                 setResult(RESULT_OK);
                 finish();
                 break;
