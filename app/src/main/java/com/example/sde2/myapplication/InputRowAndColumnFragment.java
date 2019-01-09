@@ -63,7 +63,7 @@ implements View.OnClickListener {
         return fragment;
     }
 
-    //生成されたときの処理。保存した引数取り出しとか
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
