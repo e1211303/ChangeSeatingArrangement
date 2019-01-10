@@ -1,11 +1,9 @@
 package com.example.sde2.myapplication;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -13,7 +11,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -134,7 +131,7 @@ public class LotteryActivity extends AppCompatActivity
         final String Col_isEnabled = HelperForSeatGridDB.SeatStateConstants.ColName_isEnabled;
         final String Col_isScoped = HelperForSeatGridDB.SeatStateConstants.ColName_isScoped;
         final String Col_isEmpty = HelperForSeatGridDB.SeatStateConstants.ColName_isEmpty;
-        final String Col_StudentID = HelperForSeatGridDB.SeatStateConstants.ColName_StudentID;
+        final String Col_StudentID = HelperForSeatGridDB.SeatStateConstants.ColName_StudentName;
 
 
         //空席でない数をしらべる。入れる位置を確認　すでに入っている番号を記憶
@@ -230,7 +227,7 @@ public class LotteryActivity extends AppCompatActivity
                 .findFragmentByTag(TAG_SEAT_GRID);
 
         View view = fragment.getView();
-        GridLayout gridLayout = view.findViewById(R.id.GridLayout_Container);
+        GridLayout gridLayout = view.findViewById(R.id.GridLayout_ViewContainer);
         gridLayout.removeAllViews();
         gridLayout.setColumnCount(cols);
 
@@ -262,7 +259,7 @@ public class LotteryActivity extends AppCompatActivity
                     textView.setTypeface(null,Typeface.ITALIC);
                     textView.setTextColor(getResources().getColor(R.color.Gray_ForText));
                     textView.setBackgroundColor(
-                            getResources().getColor(R.color.BackGround_ForEmptySeat));
+                            getResources().getColor(R.color.BackGround_ForEmptySeatTextBox));
                 }
                 //以降空席設定でない場合
                 else{
@@ -279,7 +276,7 @@ public class LotteryActivity extends AppCompatActivity
                     if(is_scoped == true){
                         //スコープ設定の場合 背景を変える
                         textView.setBackgroundColor(
-                                getResources().getColor(R.color.Background_ForScopedSeat));
+                                getResources().getColor(R.color.Background_ForScopedSeatTextBox));
                     }
                 }
 
@@ -305,8 +302,8 @@ public class LotteryActivity extends AppCompatActivity
         final String TableName = HelperForSeatGridDB.SeatGridConstants.TableName;
         final String Col_ID = HelperForSeatGridDB.SeatGridConstants.ColName_ID;
         final String Col_Name = HelperForSeatGridDB.SeatGridConstants.ColName_Name;
-        final String Col_Rows = HelperForSeatGridDB.SeatGridConstants.ColName_Rows;
-        final String Col_Cols = HelperForSeatGridDB.SeatGridConstants.ColName_Cols;
+        final String Col_Rows = HelperForSeatGridDB.SeatGridConstants.ColName_Width;
+        final String Col_Cols = HelperForSeatGridDB.SeatGridConstants.ColName_Height;
 
         //IDに対応したSeatGrid取得 cursorは先頭-1の位置で帰ってくるらしい
         Cursor cursor = db.query(TableName,
@@ -347,12 +344,12 @@ public class LotteryActivity extends AppCompatActivity
         //列名　長かったので（略
         final String TableName1 = HelperForSeatGridDB.SeatStateConstants.TableName;
         final String Col_ID1 = HelperForSeatGridDB.SeatStateConstants.ColName_ID;
-        final String Col_Row = HelperForSeatGridDB.SeatStateConstants.ColName_Row;
+        final String Col_Row = HelperForSeatGridDB.SeatStateConstants.ColName_Pos;
         final String Col_Col = HelperForSeatGridDB.SeatStateConstants.ColName_Col;
         final String Col_isEnabled = HelperForSeatGridDB.SeatStateConstants.ColName_isEnabled;
         final String Col_isScoped = HelperForSeatGridDB.SeatStateConstants.ColName_isScoped;
         final String Col_isEmpty = HelperForSeatGridDB.SeatStateConstants.ColName_isEmpty;
-        final String Col_StudentID = HelperForSeatGridDB.SeatStateConstants.ColName_StudentID;
+        final String Col_StudentID = HelperForSeatGridDB.SeatStateConstants.ColName_StudentName;
         //バンドルの配列に格納
         Bundle[][] SeatStateBundles = new Bundle[rows][cols];
         for(int i=0;i<rows;i++){

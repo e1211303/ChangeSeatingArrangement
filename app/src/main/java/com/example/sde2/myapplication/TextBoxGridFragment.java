@@ -1,18 +1,13 @@
 package com.example.sde2.myapplication;
 
-import android.app.ActionBar;
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridLayout;
@@ -66,8 +61,8 @@ implements
         final String TableName = HelperForSeatGridDB.SeatGridConstants.TableName;
         final String Col_ID = HelperForSeatGridDB.SeatGridConstants.ColName_ID;
         final String Col_Name = HelperForSeatGridDB.SeatGridConstants.ColName_Name;
-        final String Col_Rows = HelperForSeatGridDB.SeatGridConstants.ColName_Rows;
-        final String Col_Cols = HelperForSeatGridDB.SeatGridConstants.ColName_Cols;
+        final String Col_Rows = HelperForSeatGridDB.SeatGridConstants.ColName_Width;
+        final String Col_Cols = HelperForSeatGridDB.SeatGridConstants.ColName_Height;
 
         //IDに対応したSeatGrid取得 cursorは先頭-1の位置で帰ってくるらしい
         Cursor cursor = db.query(TableName,
@@ -109,12 +104,12 @@ implements
         //列名　長かったので（略
         final String TableName1 = HelperForSeatGridDB.SeatStateConstants.TableName;
         final String Col_ID1 = HelperForSeatGridDB.SeatStateConstants.ColName_ID;
-        final String Col_Row = HelperForSeatGridDB.SeatStateConstants.ColName_Row;
+        final String Col_Row = HelperForSeatGridDB.SeatStateConstants.ColName_Pos;
         final String Col_Col = HelperForSeatGridDB.SeatStateConstants.ColName_Col;
         final String Col_isEnabled = HelperForSeatGridDB.SeatStateConstants.ColName_isEnabled;
         final String Col_isScoped = HelperForSeatGridDB.SeatStateConstants.ColName_isScoped;
         final String Col_isEmpty = HelperForSeatGridDB.SeatStateConstants.ColName_isEmpty;
-        final String Col_StudentID = HelperForSeatGridDB.SeatStateConstants.ColName_StudentID;
+        final String Col_StudentID = HelperForSeatGridDB.SeatStateConstants.ColName_StudentName;
         //バンドルの配列に格納
         Bundle[][] SeatStateBundles = new Bundle[rows][cols];
         for(int i=0;i<rows;i++){
@@ -168,7 +163,7 @@ implements
 
         //格納先のGridLayout取得
         GridLayout gridLayout =
-                (GridLayout)view.findViewById(R.id.GridLayout_Container);
+                (GridLayout)view.findViewById(R.id.GridLayout_ViewContainer);
         gridLayout.removeAllViews();
         gridLayout.setColumnCount(cols);
 
@@ -226,7 +221,7 @@ implements
                     textView.setTypeface(null,Typeface.ITALIC);
                     textView.setTextColor(getResources().getColor(R.color.Gray_ForText));
                     textView.setBackgroundColor(
-                            getResources().getColor(R.color.BackGround_ForEmptySeat));
+                            getResources().getColor(R.color.BackGround_ForEmptySeatTextBox));
 
                     GridLayout.LayoutParams params = new GridLayout.LayoutParams();
                     params.width = GridWidth;
@@ -451,7 +446,7 @@ implements
 
         //行列数
         View view = getView();
-        GridLayout gridLayout = view.findViewById(R.id.GridLayout_Container);
+        GridLayout gridLayout = view.findViewById(R.id.GridLayout_ViewContainer);
         if(gridLayout == null)
             return false;
 
@@ -476,10 +471,10 @@ implements
                 //データベース用
                 final String TableName1 = HelperForSeatGridDB.SeatStateConstants.TableName;
                 final String Col_ID1 = HelperForSeatGridDB.SeatStateConstants.ColName_ID;
-                final String Col_Row = HelperForSeatGridDB.SeatStateConstants.ColName_Row;
+                final String Col_Row = HelperForSeatGridDB.SeatStateConstants.ColName_Pos;
                 final String Col_Col = HelperForSeatGridDB.SeatStateConstants.ColName_Col;
                 final String Col_isEnabled = HelperForSeatGridDB.SeatStateConstants.ColName_isEnabled;
-                final String Col_StudentID = HelperForSeatGridDB.SeatStateConstants.ColName_StudentID;
+                final String Col_StudentID = HelperForSeatGridDB.SeatStateConstants.ColName_StudentName;
 
                 ContentValues cv = new ContentValues();
                 final String Where =
@@ -510,7 +505,7 @@ implements
 
     private ArrayList<Spinner> getSpinners(){
         View view = getView();
-        GridLayout gridLayout = (GridLayout)view.findViewById(R.id.GridLayout_Container);
+        GridLayout gridLayout = (GridLayout)view.findViewById(R.id.GridLayout_ViewContainer);
 
         //すべてのスピナーを取得
         final int numOfViews = gridLayout.getChildCount();

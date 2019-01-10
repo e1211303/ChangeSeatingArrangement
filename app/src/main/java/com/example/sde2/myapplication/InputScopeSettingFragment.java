@@ -12,12 +12,12 @@ import android.widget.Button;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link InputUsingScopeSettingFragment.OnFragmentInteractionListener} interface
+ * {@link InputScopeSettingFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link InputUsingScopeSettingFragment#newInstance} factory method to
+ * Use the {@link InputScopeSettingFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class InputUsingScopeSettingFragment extends Fragment
+public class InputScopeSettingFragment extends Fragment
 implements View.OnClickListener{
 
     private OnFragmentInteractionListener mListener;
@@ -33,11 +33,10 @@ implements View.OnClickListener{
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onGoToNext(InputUsingScopeSettingFragment fragment);
+        void onGoToNext(InputScopeSettingFragment fragment);
     }
 
-    public InputUsingScopeSettingFragment() {
+    public InputScopeSettingFragment() {
         // Required empty public constructor
     }
 
@@ -46,14 +45,12 @@ implements View.OnClickListener{
      * this fragment using the provided parameters.
      *
      *
-     * @return A new instance of fragment InputUsingScopeSettingFragment.
+     * @return A new instance of fragment InputScopeSettingFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static InputUsingScopeSettingFragment newInstance() {
-        InputUsingScopeSettingFragment fragment = new InputUsingScopeSettingFragment();
+    public static InputScopeSettingFragment newInstance() {
+        InputScopeSettingFragment fragment = new InputScopeSettingFragment();
         Bundle args = new Bundle();
-        //args.putString(ARG_PARAM1, param1);
-        //args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }

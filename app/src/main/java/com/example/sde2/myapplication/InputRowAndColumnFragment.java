@@ -81,7 +81,7 @@ implements View.OnClickListener {
         button_OK.setOnClickListener(this);
         button_Next.setOnClickListener(this);
 
-        //スピナーの項目を用意
+        //スピナーの項目(行数列数の数字)を用意
         //アダプタがintを受け付けてくれないからIntegerに変える。いい方法がわからない。
         int items[] = getResources().getIntArray(R.array.RowAndColumn_items);
         int size = items.length;
@@ -110,7 +110,7 @@ implements View.OnClickListener {
         return view;
     }
 
-    // TODO: 押されたボタンに応じてActivityにコールバック
+    // 押されたボタンに応じてActivityにコールバック
     public void onClick(View view) {
 
         //連打禁止
@@ -123,11 +123,7 @@ implements View.OnClickListener {
         int id = view.getId();
         switch (id){
             case R.id.Button_OK:
-                //次へボタンをちょっと経ってから有効化
-                MyUtil_ForButton.disableButtonForMillisecs(
-                        (Button) getActivity().findViewById(R.id.Button_next),
-                        1000);
-                
+
                 if(mListener == null)break;
                 //スピナーの値を読んで返す
                 Spinner spinner_rows = getActivity().findViewById(R.id.Spinner_row);
@@ -135,7 +131,6 @@ implements View.OnClickListener {
                 int rows = (int)spinner_rows.getSelectedItem();
                 int cols = (int)spinner_cols.getSelectedItem();
                 mListener.onSetRowsAndColumns(this,rows,cols);
-
 
                 break;
 

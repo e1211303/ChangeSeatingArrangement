@@ -21,14 +21,13 @@ public class RowAndColumnActivity extends AppCompatActivity
         implements
         CheckBoxGridFragment.OnFragmentInteractionListener,
         InputRowAndColumnFragment.OnFragmentInteractionListener,
-        InputUsingScopeSettingFragment.OnFragmentInteractionListener
+        InputScopeSettingFragment.OnFragmentInteractionListener
 {
-
-    private static final String ARG_NUM_ROWS = "param1";
-    private static final String ARG_NUM_COLS = "param2";
 
     private static final String TAG_SEAT_GRID = "CheckBoxGridFragment";
     private static final String TAG_SCOPE ="ScopeFragment";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,14 +44,9 @@ public class RowAndColumnActivity extends AppCompatActivity
     @Override
     public void onSetRowsAndColumns(final InputRowAndColumnFragment inputRowAndColumnFragment, final int rows, final int columns)
     {
-        //引数をまとめたもの
-        Bundle bundle = new Bundle();
-        bundle.putInt(ARG_NUM_ROWS,rows);
-        bundle.putInt(ARG_NUM_COLS,columns);
 
-        //フラグメントの実体を生成
-        CheckBoxGridFragment checkBoxGridFragment = new CheckBoxGridFragment();
-        checkBoxGridFragment.setArguments(bundle);
+        //フラグメントの実体を生成 (引数バンドル済)
+        CheckBoxGridFragment checkBoxGridFragment = CheckBoxGridFragment.newInstance(rows,columns);
 
         //フラグメント差し込み
         getSupportFragmentManager()
@@ -61,7 +55,6 @@ public class RowAndColumnActivity extends AppCompatActivity
                 .commit();
     }
 
-    //todo 前のフラグメントの状態保持？
     //行列入力部の次へで
     @Override
     public void onGoToNext(InputRowAndColumnFragment fragment)
@@ -76,11 +69,11 @@ public class RowAndColumnActivity extends AppCompatActivity
         CheckBoxGridFragment checkBoxGridFragment = (CheckBoxGridFragment)fragmentBottom;
 
         //入力部fragment差し替え
-        InputUsingScopeSettingFragment inputUsingScopeSettingFragment=
-                new InputUsingScopeSettingFragment();
+        InputScopeSettingFragment inputScopeSettingFragment =
+                new InputScopeSettingFragment();
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.RelativeLayout_ForInputPrompt,inputUsingScopeSettingFragment,TAG_SCOPE)
+                .replace(R.id.RelativeLayout_ForInputPrompt, inputScopeSettingFragment,TAG_SCOPE)
                 .commit();
 
         //空席状態を取得
@@ -112,7 +105,7 @@ public class RowAndColumnActivity extends AppCompatActivity
 
     //スコープ設定の次へで
     @Override
-    public void onGoToNext(InputUsingScopeSettingFragment fragment){
+    public void onGoToNext(InputScopeSettingFragment fragment){
         //下部のグリッドを取得できるか
         Fragment fragmentBottom=
                 getSupportFragmentManager()
@@ -194,8 +187,8 @@ public class RowAndColumnActivity extends AppCompatActivity
         //SeatGrid分
         ContentValues values_SeatGrid = new ContentValues();
         values_SeatGrid.put(HelperForSeatGridDB.SeatGridConstants.ColName_Name,GridName);
-        values_SeatGrid.put(HelperForSeatGridDB.SeatGridConstants.ColName_Rows,rows);
-        values_SeatGrid.put(HelperForSeatGridDB.SeatGridConstants.ColName_Cols,cols);
+        values_SeatGrid.put(HelperForSeatGridDB.SeatGridConstants.ColName_Width,rows);
+        values_SeatGrid.put(HelperForSeatGridDB.SeatGridConstants.ColName_Height,cols);
 
         //トランザクション開始
         db.beginTransaction();
@@ -214,7 +207,7 @@ public class RowAndColumnActivity extends AppCompatActivity
                 //座席状態一つ追加
                 ContentValues values_SeatState = new ContentValues();
                 values_SeatState.put(HelperForSeatGridDB.SeatStateConstants.ColName_ID,GridID);
-                values_SeatState.put(HelperForSeatGridDB.SeatStateConstants.ColName_Row,i);
+                values_SeatState.put(HelperForSeatGridDB.SeatStateConstants.ColName_Pos,i);
                 values_SeatState.put(HelperForSeatGridDB.SeatStateConstants.ColName_Col,j);
 
                 //席状態を確認
@@ -235,7 +228,7 @@ public class RowAndColumnActivity extends AppCompatActivity
                 values_SeatState.put(HelperForSeatGridDB.SeatStateConstants.ColName_isScoped,isScoped);
 
                 //まだ入っていないので
-                values_SeatState.put(HelperForSeatGridDB.SeatStateConstants.ColName_StudentID,"");
+                values_SeatState.put(HelperForSeatGridDB.SeatStateConstants.ColName_StudentName,"");
 
                 //挿入
                 long ret = db.insert(HelperForSeatGridDB.SeatStateConstants.TableName,null,values_SeatState);

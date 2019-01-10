@@ -4,9 +4,11 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
 
+    <color name="BackGround_ForScopedSeatCheckBox">#FFCFE0</color>
+
     <color name="Gray_ForText">#cccccc</color>
-    <color name="BackGround_ForEmptySeat">#888888</color>
-    <color name="Background_ForScopedSeat">#FFCFE0</color>
+    <color name="BackGround_ForEmptySeatTextBox">#888888</color>
+    <color name="Background_ForScopedSeatTextBox">#FFCFE0</color>
 
     <color name="Background_ForDuplicatedSpinner">@color/colorAccent</color>
     <color name="Background_ForNonDuplicatedSpinner">#FFFFFF</color>

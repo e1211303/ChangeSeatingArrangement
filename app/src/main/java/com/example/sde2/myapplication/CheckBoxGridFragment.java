@@ -23,17 +23,24 @@ import android.widget.TextView;
 public class CheckBoxGridFragment extends Fragment
 implements ObservableScrollView.ScrollViewListener,
         ObservableHorizontalScrollView.ScrollViewListener {
-    // TODO: Rename parameter arguments, choose names that match
+
+    //席状態を表す
+    public enum SeatState{
+        Normal_Checked,
+        Normal_Unchecked,
+        Scoped_Checked,
+        Scoped_Unchecked,
+        Empty
+    }
+
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_NUM_ROWS = "param1";
-    private static final String ARG_NUM_COLS = "param2";
+    public static final String ARG_NUM_ROWS = "param1";
+    public static final String ARG_NUM_COLS = "param2";
 
-    // TODO: Rename and change types of parameters
-    // 行数と列数の記憶
-    private int numRows=0;
-    private int numCols=0;
+    //行数列数記憶
+    private int mNumRows;
+    private int mNumCols;
 
-    private CheckBox[][] checkBoxes;
 
     private OnFragmentInteractionListener mListener;
 
@@ -64,8 +71,8 @@ implements ObservableScrollView.ScrollViewListener,
      * @return A new instance of fragment CheckBoxGridFragment.
      */
     public static CheckBoxGridFragment newInstance(int numRows, int numCols) {
+        // 引数をバンドルしたインスタンスを生成し返す
         CheckBoxGridFragment fragment = new CheckBoxGridFragment();
-        // 初めて作られた時の引数を記憶する
         Bundle args = new Bundle();
         args.putInt(ARG_NUM_ROWS, numRows);
         args.putInt(ARG_NUM_COLS, numCols);
@@ -78,11 +85,8 @@ implements ObservableScrollView.ScrollViewListener,
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             // 再生成されたときに、すでに受け取っていた引数をメンバ変数にセット
-            numRows = getArguments().getInt(ARG_NUM_ROWS);
-            numCols = getArguments().getInt(ARG_NUM_COLS);
-        }else{
-            numRows=1;
-            numCols=1;
+            mNumRows = getArguments().getInt(ARG_NUM_ROWS);
+            mNumCols = getArguments().getInt(ARG_NUM_COLS);
         }
     }
 
@@ -95,8 +99,8 @@ implements ObservableScrollView.ScrollViewListener,
         View view =
                 inflater.inflate(R.layout.fragment_seat_grid, container, false);
 
-        //todo 別関数にして何度も呼べるように
-        prepareCheckBoxGrid(numRows,numCols,null,view);
+        //碁盤目状のチェックボックス用意
+        prepareCheckBoxGrid(mNumRows, mNumCols,null);
         return view;
     }
 
@@ -152,52 +156,48 @@ implements ObservableScrollView.ScrollViewListener,
     }
 
     //設定値で座席表を作成する関数
-    public void prepareCheckBoxGrid(int rows, int cols, Boolean[][] seatState, View view)
+    public boolean prepareCheckBoxGrid(final int rows, final int cols, SeatState[] seatStates)
     {
-        numRows = rows;
-        numCols = cols;
+        if(rows < 1 || cols < 1)
+            return false;
 
-        //すべてチェック
-        if ( seatState == null)
+        //座席数
+        final int numOfSeats = rows*cols;
+
+        //外部から呼ばれることもできるため
+        if ( seatStates == null)
         {
-            seatState = new Boolean[numRows][numCols];
-            for(int i=0;i<numRows;i++){
-                for(int j=0;j<numCols;j++){
-                    seatState[i][j] = true;
-                }
+            //すべて普通席
+            seatStates = new SeatState[numOfSeats];
+            for(int i=0;i<numOfSeats;i++){
+                seatStates[i] = SeatState.Normal_Checked;
             }
         }
 
-        //todo これでいいか？
-        if(view == null){
-            view = getView();
+        //配列大きさ確認
+        if(seatStates.length != numOfSeats)
+            return false;
+
+        //メンバに記憶しておく
+        mNumRows = rows;
+        mNumCols = cols;
+
+        //各種Viewの操作のため
+        View view = getView();
+
+        // 席状態をもとに表示するチェックボックスを用意
+        CheckBox[] checkBoxes = new CheckBox[numOfSeats];
+        for(int i=0;i<numOfSeats;++i){
+            checkBoxes[i] = createCheckBoxBySeatState(seatStates[i]);
         }
 
-        // チェックボックス用意
-        checkBoxes = new CheckBox[numRows][numCols]; //1次元に？
-        CheckBox checkBox;
-        for (int i=0;i<numRows;i++) {
-            for (int j=0;j<numCols;j++) {
-                checkBox = new CheckBox(getActivity());
-                //nullで無効、真偽値があればそれに従う
-                if(seatState[i][j]==null){
-                    checkBox.setChecked(false);
-                    checkBox.setEnabled(false);
-                }else{
-                    checkBox.setChecked(seatState[i][j].booleanValue());
-                    checkBox.setEnabled(true);
-                }
-                checkBoxes[i][j]=checkBox;
-            }
-        }
-        checkBox=null;
         //GridLayoutにチェックボックスを追加
         GridLayout gridLayout =
-                (GridLayout) view.findViewById(R.id.GridLayout_Container);
+                (GridLayout) view.findViewById(R.id.GridLayout_ViewContainer);
         gridLayout.removeAllViews();
-        gridLayout.setColumnCount(numCols);
+        gridLayout.setColumnCount(cols);
 
-        //リソースから
+        //グリッドの大きさなど
         final int GridSize = (int)(MyUtil_ForDpAndPx.convertDp2Px(
                 getResources().getInteger(R.integer.GridSize_ForCheckBox),
                 getActivity()
@@ -210,16 +210,13 @@ implements ObservableScrollView.ScrollViewListener,
 
 
         //チェックボックスを追加
-        for(int i=0;i<numRows;i++) {
-            for (int j=0;j<numCols;j++) {
-                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.width = GridSize;
-                params.height = GridSize;
-                params.setMargins(Margin,Margin,Margin,Margin);
-                gridLayout.addView(checkBoxes[i][j],params);
-            }
+        for(int i=0;i<numOfSeats;++i){
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.width = GridSize;
+            params.height = GridSize;
+            params.setMargins(Margin,Margin,Margin,Margin);
+            gridLayout.addView(checkBoxes[i]);
         }
-
 
         //行数表示部の設定
         LockableScrollView VerticalScroll =
@@ -230,7 +227,7 @@ implements ObservableScrollView.ScrollViewListener,
         int size = GridSize+Margin*2;
         LinearLayout linearLayout_row = view.findViewById(R.id.LinearLayout_ForRowNums);
         linearLayout_row.removeAllViews();
-        for(int i=0;i<numRows;i++)
+        for(int i = 0; i< mNumRows; i++)
         {
             LinearLayout.LayoutParams layoutParams =
                     new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,size);
@@ -249,7 +246,8 @@ implements ObservableScrollView.ScrollViewListener,
         LinearLayout linearLayout_col =
                 view.findViewById(R.id.LinearLayout_ForColNums);
         linearLayout_col.removeAllViews();
-        for(int i=0;i<numCols;i++){
+
+        for(int i = 0; i< mNumCols; i++){
             LinearLayout.LayoutParams layoutParams=
                     new LinearLayout.LayoutParams(size,LinearLayout.LayoutParams.MATCH_PARENT);
             layoutParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
@@ -268,48 +266,134 @@ implements ObservableScrollView.ScrollViewListener,
         ObservableHorizontalScrollView observableHorizontalScrollView=
                 view.findViewById(R.id.HorizontalScrollView_ForGrid);
         observableHorizontalScrollView.setOnScrollViewListener(this);
+
+        return true;
     }
 
-    //チェックボックスをすべてチェックつけたり外したり(無効なもの以外)
-    public void setIsCheckedAll(boolean isChecked)
+    //指定位置のチェックボックス取得
+    private CheckBox getCheckBoxAt(final int i,final int j){
+        View view = getView();
+        if(view == null)
+            return null;
+        GridLayout gridLayout = (GridLayout)view.findViewById(R.id.GridLayout_ViewContainer);
+        if(gridLayout instanceof GridLayout == false)
+            return null;
+
+        //todo チェックボックス取得 すぐ下を参考に
+
+    }
+
+    //チェックボックスをすべてチェックつけたり外したり (無効なもの以外)
+    public boolean setIsCheckedAll(boolean isChecked)
     {
-        for(int i=0;i<numRows;i++){
-            for(int j=0;j<numCols;j++){
-                if(checkBoxes[i][j].isEnabled() == false)continue;
-                checkBoxes[i][j].setChecked(isChecked);
-            }
+        View view = getView();
+        if(view == null)
+            return false;
+        GridLayout gridLayout = (GridLayout)view.findViewById(R.id.GridLayout_ViewContainer);
+        if(gridLayout instanceof GridLayout == false)
+            return false;
+
+        final int numOfSeats = gridLayout.getChildCount();
+        for(int i = 0; i< mNumRows; i++){
+            //子ビューであるCheckBoxを取得
+            CheckBox checkBox = (CheckBox) gridLayout.getChildAt(i);
+            if(checkBox instanceof CheckBox == false)
+                continue;
+
+            //無効なものは触らない
+            if(checkBox.isEnabled()==false)
+                continue;
+
+            //チェックつけ外し
+            checkBox.setChecked(isChecked);
         }
+
+        return true;
     }
 
     //1つのチェックを操作
-    public Boolean setIsChecked(int row,int column,boolean isChecked)
+    public boolean setIsChecked(int row,int column,boolean isChecked)
     {
-        if(!(0<=row&&row<numRows && 0<=column&&column<numCols))return false;
-        if(checkBoxes[row][column].isEnabled() == false)return false;
+        if(row < 1 || column < 1)
+            return false;
 
-        checkBoxes[row][column].setChecked(isChecked);
+        View view = getView();
+        if(view == null)
+            return false;
+
+        GridLayout gridLayout = (GridLayout)view.findViewById(R.id.GridLayout_ViewContainer);
+        if(gridLayout instanceof GridLayout == false)
+            return false;
+
+        final int colCount = gridLayout.getColumnCount();
+        CheckBox checkBox = (CheckBox) gridLayout.getChildAt(row*colCount+column);
+        if(checkBox instanceof CheckBox==false)
+            return false;
+
+        //無効なものは触らない
+        if(checkBox.isEnabled() == false)
+            return false;
+
+        checkBox.setChecked(isChecked);
         return true;
     }
     
 
 
     //チェックボックスの状態を返す 無効ならnull
-    public Boolean[][] getIsCheckedAll()
+    public Boolean[] getIsCheckedAll()
     {
-        Boolean[][] ret = new Boolean[numRows][numCols];
-        for(int i=0;i<numRows;i++){
-            for(int j=0;j<numCols;j++){
-                if(checkBoxes[i][j].isEnabled()==true)
-                {
-                    ret[i][j] = checkBoxes[i][j].isChecked();
-                }
-                else
-                {
-                    ret[i][j]=null;
-                }
-
+        Boolean[] ret = new Boolean[mNumRows*mNumCols];
+        for(int i = 0; i< mNumRows; i++){
+            if(checkBoxes[i][j].isEnabled()==true)
+            {
+                ret[i][j] = checkBoxes[i][j].isChecked();
+            }
+            else
+            {
+                ret[i][j]=null;
             }
         }
         return ret;
+    }
+
+    //席状態から、適切なチェックボックスを作って返す
+    private CheckBox createCheckBoxBySeatState(SeatState seatState){
+        CheckBox checkBox = new CheckBox(getActivity());
+
+        final int scopedColor =
+                getResources().getColor(R.color.BackGround_ForScopedSeatCheckBox);
+
+        //Scopedは色付き。Emptyは触れない
+        switch (seatState){
+            case Normal_Checked:
+                checkBox.setEnabled(true);
+                checkBox.setChecked(true);
+                break;
+
+            case Normal_Unchecked:
+                checkBox.setEnabled(true);
+                checkBox.setChecked(false);
+                break;
+
+            case Scoped_Checked:
+                checkBox.setEnabled(true);
+                checkBox.setChecked(true);
+                checkBox.setBackgroundColor(scopedColor);
+                break;
+
+            case Scoped_Unchecked:
+                checkBox.setEnabled(true);
+                checkBox.setChecked(false);
+                checkBox.setBackgroundColor(scopedColor);
+                break;
+
+            case Empty:
+                checkBox.setEnabled(false);
+                checkBox.setChecked(false);
+                break;
+        }
+
+        return checkBox;
     }
 }

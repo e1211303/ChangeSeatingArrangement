@@ -4,30 +4,28 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.io.FilenameFilter;
-
-//todo データベースようのヘルパーを作成
+// データベースようのヘルパー
 
 public class HelperForSeatGridDB extends SQLiteOpenHelper {
-    private static final int DB_Version = 3;
+    private static final int DB_Version = 4;
     private static final String FileName ="SeatGrid.db";
     //定数
     public class SeatGridConstants{
         private SeatGridConstants(){}
 
-        public static final String TableName = "SEATGRID_TABLE";
+        public static final String TableName = "SEKIGAE_TABLE";
 
         public static final String ColName_ID = "_ID";
-        public static final String ColName_Name ="GRID_NAME";
-        public static final String ColName_Rows="ROWS";
-        public static final String ColName_Cols="COLS";
+        public static final String ColName_Width ="WIDTH";
+        public static final String ColName_Height ="HEIGHT";
+        public static final String ColName_Memo = "MEMO";
 
         public static final String Query_CreateTable =
                 "CREATE TABLE " + TableName + "("+
                         ColName_ID + " INTEGER PRIMARY KEY," +
-                        ColName_Name + " TEXT NOT NULL," +
-                        ColName_Rows + " INTEGER," +
-                        ColName_Cols + " INTEGER"+
+                        ColName_Width + " INTEGER," +
+                        ColName_Height + " INTEGER,"+
+                        ColName_Memo + " TEXT" +
                         ");";
 
         public  static final String Query_DropTable = "DROP TABLE " + TableName + ";";
@@ -36,26 +34,24 @@ public class HelperForSeatGridDB extends SQLiteOpenHelper {
     public class SeatStateConstants{
         private SeatStateConstants(){}
 
-        public static final String TableName = "SEATSTATE_TABLE";
+        public static final String TableName = "SEATS_TABLE";
 
         public static final String ColName_ID = "_ID";
-        public static final String ColName_Row = "ROW_NUM";
-        public static final String ColName_Col = "COL_NUM";
-        public static final String ColName_isEnabled = "IS_ENABLED";
-        public static final String ColName_isScoped ="IS_SCOPED";
-        public static final String ColName_isEmpty = "IS_EMPTY";
-        public static final String ColName_StudentID = "STUDENT_ID";
+        public static final String ColName_Pos = "POS";
+        public static final String ColName_Scope = "SCOPE";
+        public static final String ColName_StudentName = "NAME";
+
+        public static final int Scope_Normal = 0;
+        public static final int Scope_Scoped = 1;
+        public static final int Scope_Empty = 2;
 
         public static final String Query_CreateTable =
                 "CREATE TABLE " + TableName +"("+
                         ColName_ID + " INTEGER," +
-                        ColName_Row + " INTEGER," +
-                        ColName_Col + " INTEGER," +
-                        ColName_isEmpty + " BOOLEAN," +
-                        ColName_isEnabled + " BOOLEAN,"+
-                        ColName_isScoped + " BOOLEAN," +
-                        ColName_StudentID + " TEXT," +
-                        "PRIMARY KEY (" + ColName_ID + "," + ColName_Row + "," + ColName_Col + "),"+
+                        ColName_Pos + " INTEGER," +
+                        ColName_Scope + " INTEGER," +
+                        ColName_StudentName + " TEXT," +
+                        "PRIMARY KEY (" + ColName_ID + "," + ColName_Pos + "),"+
                         "FOREIGN KEY(" + ColName_ID + ")" + " REFERENCES " + SeatGridConstants.TableName +"("+ SeatGridConstants.ColName_ID +")"+
                         ");";
 

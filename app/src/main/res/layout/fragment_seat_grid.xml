@@ -31,10 +31,12 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/ScrollView_ForGrid">
 
+
+            <!--後で何か入れるためのGridLayout-->
             <GridLayout
-                android:id="@+id/GridLayout_Container"
+                android:id="@+id/GridLayout_ViewContainer"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"></GridLayout>
+                android:layout_height="wrap_content"/>
 
 
         </com.example.sde2.myapplication.ObservableHorizontalScrollView>
