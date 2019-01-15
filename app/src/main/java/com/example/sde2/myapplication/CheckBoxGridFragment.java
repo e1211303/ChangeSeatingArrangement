@@ -1,6 +1,9 @@
 package com.example.sde2.myapplication;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Gravity;
@@ -280,7 +283,14 @@ implements ObservableScrollView.ScrollViewListener,
             return null;
 
         //todo チェックボックス取得 すぐ下を参考に
+        final int cols = gridLayout.getColumnCount();
+        final int numOfSeats = gridLayout.getChildCount();
 
+        CheckBox checkBox = (CheckBox)gridLayout.getChildAt(i*cols+j);
+        if(checkBox instanceof CheckBox == false)
+            return null;
+
+        return checkBox;
     }
 
     //チェックボックスをすべてチェックつけたり外したり (無効なもの以外)
@@ -340,21 +350,64 @@ implements ObservableScrollView.ScrollViewListener,
     
 
 
-    //チェックボックスの状態を返す 無効ならnull
-    public Boolean[] getIsCheckedAll()
+    //チェックボックスの状態を返す
+    public SeatState[] getSeatStatesAll()
     {
-        Boolean[] ret = new Boolean[mNumRows*mNumCols];
-        for(int i = 0; i< mNumRows; i++){
-            if(checkBoxes[i][j].isEnabled()==true)
-            {
-                ret[i][j] = checkBoxes[i][j].isChecked();
+        //GridLayoutから項目数を取得
+        View view = getView();
+        if(view == null)
+            return null;
+        GridLayout gridLayout = (GridLayout)view.findViewById(R.id.GridLayout_ViewContainer);
+        if(gridLayout instanceof GridLayout == false)
+            return null;
+
+        final int numOfSeats = gridLayout.getChildCount();
+        final int scopedColor =
+                getResources().getColor(R.color.BackGround_ForScopedSeatCheckBox);
+
+        //すべてについて状態を調べる
+        SeatState[] retStates = new SeatState[numOfSeats];
+        for(int i = 0; i< numOfSeats; i++){
+            //CheckBox取得
+            CheckBox checkBox = (CheckBox)gridLayout.getChildAt(i);
+            if(checkBox instanceof CheckBox)
+                return null;    //その時点で中止してみる
+
+            //状態取得
+            final boolean isChecked = checkBox.isChecked();
+            final boolean isEnabled = checkBox.isEnabled();
+            final int backColor = ((ColorDrawable) checkBox.getBackground()).getColor();
+
+            //空席設定の場合
+            if(checkBox.isEnabled() == false){
+                retStates[i] = SeatState.Empty;
+                continue;
             }
-            else
-            {
-                ret[i][j]=null;
+
+            //スコープ設定の場合
+            if(backColor == scopedColor){
+                //チェック済かどうか
+                SeatState state;
+                if(isChecked){
+                    state = SeatState.Scoped_Checked;
+                }else{
+                    state = SeatState.Scoped_Unchecked;
+                }
+                retStates[i] = state;
+                continue;
             }
+
+            //あとは普通席
+            SeatState state;
+            if(isChecked){
+                state = SeatState.Normal_Checked;
+            }else{
+                state = SeatState.Normal_Unchecked;
+            }
+            retStates[i] = state;
+            //continue;
         }
-        return ret;
+        return retStates;
     }
 
     //席状態から、適切なチェックボックスを作って返す

@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 
@@ -77,21 +78,23 @@ public class RowAndColumnActivity extends AppCompatActivity
                 .commit();
 
         //空席状態を取得
-        Boolean[][] seatState =
-                checkBoxGridFragment.getIsCheckedAll();
-        //falseのところをnullに
-        final int rows = seatState.length;
-        final int cols = seatState[0].length;
-        for(int i=0;i<rows;i++){
-            for(int j=0;j<cols;j++){
-                Boolean b = seatState[i][j];
-                if(b != null && b.booleanValue() == false){
-                    seatState[i][j] = null;
-                }
+        CheckBoxGridFragment.SeatState[] seatState =
+                checkBoxGridFragment.getSeatStatesAll();
+
+        final int size = seatState.length;
+        //長いので
+        final CheckBoxGridFragment.SeatState Normal_Unchecked =
+                CheckBoxGridFragment.SeatState.Normal_Unchecked;
+        final CheckBoxGridFragment.SeatState Empty =
+                CheckBoxGridFragment.SeatState.Empty;
+        //普通席のチェックが入っていないところを空席とする
+        for(int i=0;i<size;++i){
+            if(seatState[i] == Normal_Unchecked){
+                seatState[i] = Empty;
             }
         }
 
-        //空席部分以外のGridを表示
+        //空席部分以外のGridを表示 todo　もとの行列数を使いたい
         checkBoxGridFragment.prepareCheckBoxGrid(rows,cols,seatState,null);
         //チェックを外す
         checkBoxGridFragment.setIsCheckedAll(false);
@@ -118,7 +121,7 @@ public class RowAndColumnActivity extends AppCompatActivity
         //席状態取得
         //null->空席　true->スコープ内　false->スコープ外
         final Boolean[][] seatStates =
-                checkBoxGridFragment.getIsCheckedAll();
+                checkBoxGridFragment.getSeatStatesAll();
 
         final int rows = seatStates.length;
         final int cols = seatStates[0].length;
